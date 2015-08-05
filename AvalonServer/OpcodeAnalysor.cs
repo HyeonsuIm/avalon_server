@@ -23,6 +23,7 @@ namespace AvalonServer
         /// <returns>각 영역별로 나뉜 데이터를 저장한 객체 반환</returns>
         public CommunicationForm separateOpcode()
         {
+            Console.WriteLine(dataString);
             CommunicationForm form;
             FormNumber formNumber = (FormNumber)(dataString[0] - 48);
 

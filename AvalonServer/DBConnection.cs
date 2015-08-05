@@ -19,7 +19,7 @@ namespace AvalonServer
         public void connect()
         {
             try {
-                conn = new MySqlConnection(@"server=203.255.3.72;userid=avalon;password=AvalonPw;database=avalon;");
+                conn = new MySqlConnection(@"Server = 203.255.3.72; Database = avalon; Uid = avalon; pwd = AvalonPw");
                 conn.Open();
                 Console.WriteLine("DB connection success");
             }catch(MySqlException)
@@ -76,8 +76,9 @@ namespace AvalonServer
                 else
                     result = "0";
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("{0}", ex.ToString());
                 result = "9";
             }
             finally{

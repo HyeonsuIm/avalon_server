@@ -78,7 +78,6 @@ namespace AvalonServer
                 // 로그인 요청
                 case 10:
                     result = "" + formNumber + opcode;
-                    DBC = new DBConnection();
                     result = DBC.selectUser(argumentList[0], argumentList[1]);
                     if (result == "")
                     {
@@ -93,10 +92,8 @@ namespace AvalonServer
                     break;
                 // id 중복검사
                 case 11:
-                    query = "select U_id from avalondb.user where U_id = '"+argumentList[0]+"'";
+                    query = "select U_id from avalon.user where U_id = '"+argumentList[0]+"'";
                     result = "" + formNumber + opcode;
-
-                    DBC = new DBConnection();
                     DBC.setQuery(query);
 
                     result += "01" + DBC.executeNonQuery();
@@ -105,10 +102,8 @@ namespace AvalonServer
                     break;
                 // 닉네임 중복검사
                 case 12:
-                    query = "select U_id from avalondb.user where U_Nick = '" + argumentList[0] + "'";
+                    query = "select U_id from avalon.user where U_Nick = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
-
-                    DBC = new DBConnection();
                     DBC.setQuery(query);
 
                     result += "01" + DBC.executeNonQuery();
@@ -117,10 +112,8 @@ namespace AvalonServer
                     break;
                 // email 중복검사
                 case 13:
-                    query = "select U_id from avalondb.user where U_Email = '" + argumentList[0] + "'";
+                    query = "select U_id from avalon.user where U_Email = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
-
-                    DBC = new DBConnection();
                     DBC.setQuery(query);
 
                     result += "01" + DBC.executeNonQuery();
@@ -130,13 +123,11 @@ namespace AvalonServer
                 // 회원가입
                 case 14:
                     result = "" + formNumber + opcode + "01";
-                    DBC = new DBConnection();
                     result += DBC.insertUser(argumentList, argumentList.Length);
                     connectionThread.sendMessage(result);
                     break;
                 // 아이디 찾기
                 case 15:
-                    DBC = new DBConnection();
                     result = DBC.selectUser(argumentList[0]);
                     if (result == "")
                         result = "" + formNumber + opcode + "00";
