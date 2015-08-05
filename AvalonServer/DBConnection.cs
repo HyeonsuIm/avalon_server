@@ -15,11 +15,15 @@ namespace AvalonServer
         MySqlDataAdapter da;
         DataSet ds;
         string query;
+        string IP = "203.255.3.72";
+        string ID = "avalon";
+        string PW = "AvalonPw";
+        string database = "avalon";
 
         public void connect()
         {
             try {
-                conn = new MySqlConnection(@"server=203.255.3.72;userid=avalon;password=AvalonPw;database=avalon;");
+                conn = new MySqlConnection(@"server="+IP+";userid="+ID+";password="+PW+";database="+database+";");
                 conn.Open();
                 Console.WriteLine("DB connection success");
             }catch(MySqlException)
@@ -89,8 +93,8 @@ namespace AvalonServer
         public int insertUser(string[] argumentList, int argumentCount)
         {
             try {
-                query = "insert into avalondb.user(U_Id,U_Pw,U_Nick,U_Email) values('" + argumentList[0] + "'";
-                for (int i = 1; i < argumentCount; i++) {
+                query = "insert into avalondb.user(U_Id,U_Pw,U_Nick,U_Email) values('" + argumentList[0] + "','"+Encoding.UTF8.GetBytes(argumentList[1])+"'";
+                for (int i = 2; i < argumentCount; i++) {
                     query += ",'" + argumentList[i] + "'";
                 }
                 query += ")";
