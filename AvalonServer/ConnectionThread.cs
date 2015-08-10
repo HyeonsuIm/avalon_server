@@ -118,7 +118,7 @@ namespace AvalonServer
 
         public void sendMessage(string data)
         {
-            Console.WriteLine("send message : {0}",data);
+            Console.WriteLine("보낸 메세지 : {0}",data);
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             ns.Write(byteData, 0, byteData.Length);
         }
