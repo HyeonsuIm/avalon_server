@@ -93,8 +93,8 @@ namespace AvalonServer
         public int insertUser(string[] argumentList, int argumentCount)
         {
             try {
-                query = "insert into avalondb.user(U_Id,U_Pw,U_Nick,U_Email) values('" + argumentList[0] + "','"+Encoding.UTF8.GetBytes(argumentList[1])+"'";
-                for (int i = 2; i < argumentCount; i++) {
+                query = "insert into user(U_Id,U_Pw,U_Nick,U_Mail) values('" + argumentList[0] + "'";
+                for (int i = 1; i < argumentCount; i++) {
                     query += ",'" + argumentList[i] + "'";
                 }
                 query += ")";
@@ -118,7 +118,7 @@ namespace AvalonServer
         public string selectUser(string id, string pwd)
         {
             string result;
-            query = "select U_Id from avalondb.user where id='" + id + "','" + pwd + "'" ;
+            query = "select U_Id from user where U_pw=" + pwd;
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);
@@ -140,7 +140,7 @@ namespace AvalonServer
 
         public string selectUser(string email) {
             string result;
-            query = "select U_Id from avalondb.user where U_Email='" + email + "'";
+            query = "select U_Id from user where U_Mail='" + email + "'";
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);

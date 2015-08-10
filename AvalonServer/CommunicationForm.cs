@@ -92,7 +92,7 @@ namespace AvalonServer
                     break;
                 // id 중복검사
                 case 11:
-                    query = "select U_id from avalon.user where U_id = '"+argumentList[0]+"'";
+                    query = "select U_id from user where U_id = '"+argumentList[0]+"'";
                     result = "" + formNumber + opcode;
                     DBC.setQuery(query);
 
@@ -102,7 +102,7 @@ namespace AvalonServer
                     break;
                 // 닉네임 중복검사
                 case 12:
-                    query = "select U_id from avalon.user where U_Nick = '" + argumentList[0] + "'";
+                    query = "select U_id from user where U_Nick = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
                     DBC.setQuery(query);
 
@@ -112,7 +112,7 @@ namespace AvalonServer
                     break;
                 // email 중복검사
                 case 13:
-                    query = "select U_id from avalon.user where U_Email = '" + argumentList[0] + "'";
+                    query = "select U_id from user where U_Mail = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
                     DBC.setQuery(query);
 
