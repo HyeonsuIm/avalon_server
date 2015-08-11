@@ -80,7 +80,7 @@ namespace AvalonServer
                 // 로그인 요청
                 case 10:
                     result = "" + formNumber + opcode;
-                    result = DBC.selectUser(argumentList[0], argumentList[1]);
+                    DBC.selectUser(argumentList[0], argumentList[1], out result, out userNick);
                     if (result == "")
                     {
                         result = "" + formNumber + opcode + "01" + result;

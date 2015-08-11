@@ -115,10 +115,9 @@ namespace AvalonServer
             return 0;
         }
 
-        public string selectUser(string id, string pwd)
+        public void selectUser(string id, string pwd, out string result, out string nick)
         {
-            string result;
-            query = "select U_Id from user where U_pw=" + pwd;
+            query = "select U_Id,U_Nick from user where U_Id='"+id+"' and U_pw=" + pwd;
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);
@@ -127,15 +126,16 @@ namespace AvalonServer
             {
                 DataRow dr = ds.Tables[0].Rows[0];
                 result = (string)dr["U_Id"];
+                nick = (string)dr["U_Nick"];
             }
             else
             {
                 result = "";
+                nick = "";
             }
 
             ds.Dispose();
             da.Dispose();
-            return result;
         }
 
         public string selectUser(string email) {
@@ -161,6 +161,5 @@ namespace AvalonServer
             return result;
 
         }
-
     }
 }
