@@ -23,7 +23,8 @@ namespace AvalonServer
         /// <returns>각 영역별로 나뉜 데이터를 저장한 객체 반환</returns>
         public CommunicationForm separateOpcode()
         {
-            Console.WriteLine(dataString);
+            Console.WriteLine("<received data>");
+            Console.WriteLine(dataString + "\n");
             CommunicationForm form;
             FormNumber formNumber = (FormNumber)(dataString[0] - 48);
 
@@ -53,10 +54,15 @@ namespace AvalonServer
 
             // 수신 데이터 에서 argument 갯수 정보를 분할한다.
             form.argumentCount = int.Parse(dataString.Substring(3, 2));
+
+            Console.WriteLine("<separeated data>");
+            Console.WriteLine("form number : {0}\nopcode : {1}\n argumentCount : {2}\n", form.formNumber, form.opcode, form.argumentCount);
+
+
             // 수신 데이터에서 argument를 분할한다.
             form.argumentList = divideArgument();
 
-            Console.WriteLine("form number : {0}\nopcode : {1}\n argumentCount : {2}", form.formNumber, form.opcode, form.argumentCount);
+            
             return form;
         }
 

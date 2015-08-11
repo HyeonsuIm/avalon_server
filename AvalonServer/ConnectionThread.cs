@@ -99,7 +99,7 @@ namespace AvalonServer
                     if (recv == 0)
                         break;
 
-                    
+                    Console.WriteLine("********************message receive*********************");
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     CommunicationForm comm = analysor.separateOpcode();
@@ -115,10 +115,12 @@ namespace AvalonServer
                     }
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIp, receiveString);
+                    Console.WriteLine("********************message process complete*********************");
                 }
                 catch (ArgumentException)
                 {
-                    Console.WriteLine("argument count incorrect");
+                    Console.WriteLine("<error>");
+                    Console.WriteLine("argument count incorrect\n");
 
                 }
                 catch(Exception e)
@@ -134,7 +136,8 @@ namespace AvalonServer
 
         public void sendMessage(string data)
         {
-            Console.WriteLine("보낸 메세지 : {0}",data);
+            Console.WriteLine("<send Message>");
+            Console.WriteLine("{0}\n",data);
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             ns.Write(byteData, 0, byteData.Length);
         }

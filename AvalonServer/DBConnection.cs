@@ -25,10 +25,11 @@ namespace AvalonServer
             try {
                 conn = new MySqlConnection(@"server="+IP+";userid="+ID+";password="+PW+";database="+database+";");
                 conn.Open();
-                Console.WriteLine("DB connection success");
+                Console.WriteLine("DB connection success\n");
             }catch(MySqlException)
             {
-                Console.WriteLine("DB connection error");
+                Console.WriteLine("error");
+                Console.WriteLine("DB connection fail\n");
                 Environment.Exit(0);
             }
         }
@@ -56,7 +57,6 @@ namespace AvalonServer
             if (ds.Tables.Count != 0)
             {
                 result = ds.Tables[0].Rows[0][idpw].ToString();
-                Console.WriteLine("{0}", result);
             }
             else
             {
@@ -104,12 +104,14 @@ namespace AvalonServer
             }
             catch (IndexOutOfRangeException)
             {
-                Console.WriteLine("insert fail, argument count error");
+                Console.WriteLine("<error>");
+                Console.WriteLine("insert fail, argument count incorrect\n");
                 return 1;
             }
             catch (MySqlException)
             {
-                Console.WriteLine("insert fail");
+                Console.WriteLine("<error>");
+                Console.WriteLine("insert fail\n");
                 return 2;
             }
             return 0;
@@ -192,8 +194,9 @@ namespace AvalonServer
             }
             catch (MySqlException e)
             {
+                Console.WriteLine("<error>");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("update fail");
+                Console.WriteLine("update fail\n");
             }
         }
     }

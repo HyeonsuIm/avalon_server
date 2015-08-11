@@ -149,7 +149,8 @@ namespace AvalonServer
                     }
                     else
                     {
-                        Console.WriteLine("아이디 또는 이메일 오류");
+                        Console.WriteLine("<error>");
+                        Console.WriteLine("아이디 또는 이메일 오류\n");
                         result = "" + formNumber + opcode + "01" + "0";
                     }
                     connectionThread.sendMessage(result);

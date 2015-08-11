@@ -60,7 +60,7 @@ namespace AvalonServer
                 }catch(ObjectDisposedException e)
                 {
                     removeClient(i);
-                    Console.WriteLine("Client abnormal disconnected : active connections");
+                    Console.WriteLine("Client abnormal disconnected : active connections\n");
                 }
             }
         }
