@@ -13,7 +13,7 @@ namespace AvalonServer
     class ThreadPoolManage
     {
         // 클라이언트 정보를 관리할 리스트
-        List<TcpClient> clientList;
+        List<ConnectionThread> clientList;
 
         // 클라이언트 접속 대기를 위한 객체
         private TcpListener client;
@@ -30,7 +30,7 @@ namespace AvalonServer
             this.DBC = DBC;
             this.roomListInfo = roomListInfo;
             DBC.connect();
-            clientList = new List<TcpClient>();
+            clientList = new List<ConnectionThread>();
             client = new TcpListener(IPAddress.Any, 9050);
             client.Start();
 
@@ -55,7 +55,7 @@ namespace AvalonServer
             byte[] byteData = Encoding.UTF8.GetBytes(data);
             for (int i = 0; i < clientList.Count; i++) {
                 try {
-                    NetworkStream ns = clientList.ElementAt(i).GetStream();
+                    NetworkStream ns = clientList.ElementAt(i).ns;
                     ns.Write(byteData, 0, byteData.Length);
                 }catch(ObjectDisposedException e)
                 {
@@ -65,22 +65,34 @@ namespace AvalonServer
             }
         }
 
+        public void sendToUser(string user, string data)
+        {
+            byte[] byteData = Encoding.UTF8.GetBytes(data);
+            for(int i=0;i<clientList.Count;i++){
+                if (user == clientList.ElementAt(i).userNick)
+                {
+                    NetworkStream ns = clientList.ElementAt(i).ns;
+                    ns.Write(byteData, 0, byteData.Length);
+                }
+            }
+        }
+
         /// <summary>
         /// 리스트에 TcpClient객체 추가
         /// </summary>
         /// <param name="tcpClient">추가할 TcpClient 객체</param>
-        public void addClient(TcpClient tcpClient)
+        public void addClient(ConnectionThread connectionThread)
         {
-            clientList.Add(tcpClient);
+            clientList.Add(connectionThread);
         }
 
         /// <summary>
         /// 리스트에 있는 TcpClient객체 제거
         /// </summary>
         /// <param name="tcpClient">제거할 TcpClient 객체</param>
-        public void removeClient(TcpClient tcpClient)
+        public void removeClient(ConnectionThread connectionThread)
         {
-            clientList.Remove(tcpClient);
+            clientList.Remove(connectionThread);
         }
 
         /// <summary>

@@ -16,13 +16,21 @@ namespace AvalonServer
         TcpClient client;
 
         // 클라이언트와의 데이터 전송을 위한 객체
-        NetworkStream ns;
+        public NetworkStream ns
+        {
+            get;
+            set;
+        }
 
         // 클라이언트 ip
         String clientIp;
 
         // 유저 닉네임
-        string userNick;
+        public string userNick
+        {
+            get;
+            set;
+        }
 
         // 데이터 송수신용
         byte[] data = new byte[1024];
@@ -51,7 +59,7 @@ namespace AvalonServer
             client = threadListener.AcceptTcpClient();
 
             connections++;
-            threadPoolManage.addClient(client);
+            threadPoolManage.addClient(this);
 
             ns = client.GetStream();
             clientIp = client.Client.RemoteEndPoint.ToString();
@@ -69,7 +77,7 @@ namespace AvalonServer
             
             ns.Close();
             client.Close();
-            threadPoolManage.removeClient(client);
+            threadPoolManage.removeClient(this);
             connections--;
             Console.WriteLine("Client disconnect\nip : {0}\nconnections : {1}\n", clientIp, connections);
         }
@@ -115,7 +123,7 @@ namespace AvalonServer
                 }
                 catch(Exception e)
                 {
-                    threadPoolManage.removeClient(client);
+                    threadPoolManage.removeClient(this);
                     Console.WriteLine(e.Message);
                     break;
                 }

@@ -79,9 +79,8 @@ namespace AvalonServer
             {
                 // 로그인 요청
                 case 10:
-                    result = "" + formNumber + opcode;
                     DBC.selectUser(argumentList[0], argumentList[1], out result, out userNick);
-                    if (result == "")
+                    if (result != "")
                     {
                         result = "" + formNumber + opcode + "01" + result;
                         connectionThread.sendMessage(result);
@@ -89,7 +88,7 @@ namespace AvalonServer
                     }
                     else
                     {
-                        result = "" + formNumber + opcode + "00";
+                        result = "" + formNumber + opcode + "01" + "0";
                         connectionThread.sendMessage("010010");
                     }
                     
@@ -171,7 +170,9 @@ namespace AvalonServer
                 case 0:
                     threadPoolManage.sendToAll("10001" + argumentList[0]);
                     break;
+                // 귓속말
                 case 1:
+                    threadPoolManage.sendToUser("", "10101" + argumentList[0]);
                     break;
                 //방정보 요청
                 case 2:

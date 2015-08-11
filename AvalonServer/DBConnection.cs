@@ -117,7 +117,7 @@ namespace AvalonServer
 
         public void selectUser(string id, string pwd, out string result, out string nick)
         {
-            query = "select U_Id,U_Nick from user where U_Id='"+id+"' and U_pw=" + pwd;
+            query = "select U_Index,U_Nick from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);
@@ -125,7 +125,7 @@ namespace AvalonServer
             if (ds.Tables[0].Rows.Count != 0)
             {
                 DataRow dr = ds.Tables[0].Rows[0];
-                result = (string)dr["U_Id"];
+                result = dr["U_Index"].ToString();
                 nick = (string)dr["U_Nick"];
             }
             else
