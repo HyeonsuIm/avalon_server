@@ -177,6 +177,28 @@ namespace AvalonServer
                     break;
                 case 3:
                     break;
+                case 4:
+                    try{
+                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], argumentList[3]);
+                        connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
+                    }catch(Exception e){
+                        Console.WriteLine(e.Message);
+                        connectionThread.sendMessage("" + formNumber + "04" + "01" + "0");
+                    }
+                    
+                    break;
+                case 5:
+                    try
+                    {
+                        roomListInfo.comeInRoom(argumentList[0], Int16.Parse(argumentList[1]), argumentList[2]);
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "1");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
+                    }
+                    break;
             }
         }
     }
