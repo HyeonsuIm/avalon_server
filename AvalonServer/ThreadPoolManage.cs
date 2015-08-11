@@ -101,7 +101,16 @@ namespace AvalonServer
         /// <param name="n">리스트 인덱스</param>
         public void removeClient(int n)
         {
-            clientList.RemoveAt(n);
+            try
+            {
+                clientList.RemoveAt(n);
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                Console.WriteLine("<error>");
+                Console.WriteLine(e.Message);
+                Console.WriteLine("index range out\n");
+            }
         }
     }
 }

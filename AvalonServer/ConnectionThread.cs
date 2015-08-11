@@ -99,7 +99,7 @@ namespace AvalonServer
                     if (recv == 0)
                         break;
 
-                    Console.WriteLine("********************message receive*********************");
+                    Console.WriteLine("\n********************message receive*********************");
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     CommunicationForm comm = analysor.separateOpcode();
@@ -115,7 +115,7 @@ namespace AvalonServer
                     }
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIp, receiveString);
-                    Console.WriteLine("********************message process complete*********************");
+                    
                 }
                 catch (ArgumentException)
                 {
@@ -129,8 +129,9 @@ namespace AvalonServer
                     Console.WriteLine(e.Message);
                     break;
                 }
+                Console.WriteLine("********************message process complete*********************\n");
             }
-            Console.WriteLine();
+            
             disConnect();
         }
 

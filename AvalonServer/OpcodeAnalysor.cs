@@ -56,7 +56,7 @@ namespace AvalonServer
             form.argumentCount = int.Parse(dataString.Substring(3, 2));
 
             Console.WriteLine("<separeated data>");
-            Console.WriteLine("form number : {0}\nopcode : {1}\n argumentCount : {2}\n", form.formNumber, form.opcode, form.argumentCount);
+            Console.WriteLine("form number : {0}\nopcode : {1}\nargumentCount : {2}", form.formNumber, form.opcode, form.argumentCount);
 
 
             // 수신 데이터에서 argument를 분할한다.
@@ -76,8 +76,12 @@ namespace AvalonServer
             string[] argumentList;
             int argumentCount = int.Parse(dataString.Substring(3, 2));
             argumentList = argument.Split('\u0001');
-            Console.WriteLine("argument : {0}", argument);
-            if (argumentCount != argumentList.Length)
+            Console.WriteLine("argument : {0}\n", argument);
+            if (argumentCount == 0)
+            {
+                return null;
+            }
+            else if (argumentCount != argumentList.Length)
             {
                 throw new ArgumentException();
             }

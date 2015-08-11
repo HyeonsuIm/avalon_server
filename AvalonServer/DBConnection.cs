@@ -108,9 +108,10 @@ namespace AvalonServer
                 Console.WriteLine("insert fail, argument count incorrect\n");
                 return 1;
             }
-            catch (MySqlException)
+            catch (MySqlException e)
             {
                 Console.WriteLine("<error>");
+                Console.WriteLine(e.Message);
                 Console.WriteLine("insert fail\n");
                 return 2;
             }
