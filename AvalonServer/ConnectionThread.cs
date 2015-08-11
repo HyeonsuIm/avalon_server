@@ -110,7 +110,7 @@ namespace AvalonServer
                 }
                 catch (ArgumentException)
                 {
-                    Console.WriteLine("argument incorrect");
+                    Console.WriteLine("argument count incorrect");
 
                 }
                 catch(Exception e)

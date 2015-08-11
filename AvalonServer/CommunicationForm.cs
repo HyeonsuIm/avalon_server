@@ -226,9 +226,10 @@ namespace AvalonServer
             switch (opcode)
             {
                 case 0:
-                    connectionThread.sendMessage("90000");
+                    connectionThread.sendMessage("" + formNumber + "00" + "00");
                     break;
                 case 1:
+                    connectionThread.sendMessage("" + formNumber + "01" + "00");
                     break;
                 case 2:
                     break;

@@ -73,7 +73,6 @@ namespace AvalonServer
             Console.WriteLine("argument : {0}", argument);
             if (argumentCount != argumentList.Length)
             {
-                Console.WriteLine("argumentCount incorrect");
                 throw new ArgumentException();
             }
 
