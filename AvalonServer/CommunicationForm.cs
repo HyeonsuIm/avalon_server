@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -84,7 +85,6 @@ namespace AvalonServer
                     {
                         result = "" + formNumber + opcode + "01" + result;
                         connectionThread.sendMessage(result);
-                        //닉네임 정보 찾기
                     }
                     else
                     {
@@ -133,14 +133,26 @@ namespace AvalonServer
                 case 15:
                     result = DBC.selectUser(argumentList[0]);
                     if (result == "")
-                        result = "" + formNumber + opcode + "00";
+                        result = "" + formNumber + opcode + "01" + "0";
                     else
                         result = "" + formNumber + opcode + "01" + result;
                     connectionThread.sendMessage(result);
                     break;
+                // 비밀번호 찾기
                 case 16:
-                    // 비밀번호 찾기
-                    // 보류
+                    result = DBC.selectUser(argumentList[0], argumentList[1]);
+                    if (result == "1")
+                    {
+                        Confirm confirm = new Confirm(argumentList[1]);
+                        DBC.updateUser(argumentList[0], Encryption(confirm.getPassword().ToString()));
+                        result = "" + formNumber + opcode + "01" + "1";
+                    }
+                    else
+                    {
+                        Console.WriteLine("아이디 또는 이메일 오류");
+                        result = "" + formNumber + opcode + "01" + "0";
+                    }
+                    connectionThread.sendMessage(result);
                     break;
 
             }
@@ -149,6 +161,18 @@ namespace AvalonServer
         public string getNick()
         {
             return userNick;
+        }
+
+        static public string Encryption(string getValue)
+        {
+            SHA512 sha = new SHA512Managed();
+            byte[] hash = sha.ComputeHash(Encoding.ASCII.GetBytes(getValue));
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (byte b in hash)
+            {
+                stringBuilder.AppendFormat("{0:x2}:", b);
+            }
+            return stringBuilder.ToString();
         }
     }
 

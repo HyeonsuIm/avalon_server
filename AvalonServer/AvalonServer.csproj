@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Confirm.cs" />
     <Compile Include="RoomListInfo.cs" />
     <Compile Include="ConnectionThread.cs" />
     <Compile Include="DBConnection.cs" />

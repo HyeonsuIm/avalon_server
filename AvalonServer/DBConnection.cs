@@ -138,6 +138,25 @@ namespace AvalonServer
             da.Dispose();
         }
 
+        public string selectUser(string id, string email)
+        {
+            string result;
+            query = "select U_Index from user where U_Id='" + id + "' and U_mail='" + email + "'";
+            da = new MySqlDataAdapter(query, conn);
+            ds = new DataSet();
+            da.Fill(ds);
+
+            if (ds.Tables[0].Rows.Count != 0)
+            {
+                DataRow dr = ds.Tables[0].Rows[0];
+                result = "1";
+            }
+            else
+                result = "0";
+
+            return result;
+        }
+
         public string selectUser(string email) {
             string result;
             query = "select U_Id from user where U_Mail='" + email + "'";
@@ -160,6 +179,22 @@ namespace AvalonServer
             
             return result;
 
+        }
+
+        public void updateUser(string id, string password)
+        {
+            try
+            {
+                query = "update user set U_pw='" + password + "' where U_id='" + id + "'";
+
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("update fail");
+            }
         }
     }
 }
