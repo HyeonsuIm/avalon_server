@@ -66,7 +66,9 @@ namespace AvalonServer
     {
         string query;
         string result;
-        public LoginForm() { 
+        string userNick;
+
+        public LoginForm() {
             formNumber = 0;
         }
 
@@ -83,12 +85,14 @@ namespace AvalonServer
                     {
                         result = "" + formNumber + opcode + "01" + result;
                         connectionThread.sendMessage(result);
+                        //닉네임 정보 찾기
                     }
                     else
                     {
                         result = "" + formNumber + opcode + "00";
                         connectionThread.sendMessage("010010");
                     }
+                    
                     break;
                 // id 중복검사
                 case 11:
@@ -142,6 +146,11 @@ namespace AvalonServer
 
             }
         }
+
+        public string getNick()
+        {
+            return userNick;
+        }
     }
 
     /// <summary>
@@ -149,8 +158,6 @@ namespace AvalonServer
     /// </summary>
     class LobbyForm : CommunicationForm
     {
-        
-
         public LobbyForm()
         {
             formNumber = 1;

@@ -21,6 +21,9 @@ namespace AvalonServer
         // 클라이언트 ip
         String clientIp;
 
+        // 유저 닉네임
+        string userNick;
+
         // 데이터 송수신용
         byte[] data = new byte[1024];
 
@@ -97,6 +100,11 @@ namespace AvalonServer
                     comm.DBC = threadPoolManage.DBC;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
                     comm.process();
+
+                    if (comm.formNumber == 0)
+                    {
+                        userNick = ((LoginForm)comm).getNick();
+                    }
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIp, receiveString);
                 }
