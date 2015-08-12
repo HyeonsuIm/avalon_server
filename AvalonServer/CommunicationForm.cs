@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +48,10 @@ namespace AvalonServer
             set;
         }
         
+        public ThreadPoolManage threadPoolManage{
+            get;
+            set;
+        }
         abstract public void process();
 
     }
@@ -177,7 +183,7 @@ namespace AvalonServer
         {
             formNumber = 1;
         }
-        ThreadPoolManage threadPoolManage = ServerMain.threadPool;
+        
         override public void process()
         {
             switch (opcode)
@@ -193,15 +199,21 @@ namespace AvalonServer
                     break;
                 //방정보 요청
                 case 2:
-                    RoomInfo[] roomInfo = roomListInfo.getRoomListInfo();
-                    foreach(RoomInfo i in roomInfo)
-                    {
-                        //i.getRoonInfo();
-                    }
-                    connectionThread.sendMessage("" + formNumber +"02" + "04" + "01" + delimiter + "roomnumber" + delimiter + "roomname" + delimiter + "roomperson");
+                    BinaryFormatter bf = new BinaryFormatter();
+                    MemoryStream ms = new MemoryStream();
+                    bf.Serialize(ms, threadPoolManage.roomListInfo);
+                    
+                    int msSize = ms.ToArray().Length;
+                    byte[] buffer = new byte[msSize+5];
+                    Encoding.ASCII.GetBytes("10202").CopyTo(buffer, 0);
+                    ms.ToArray().CopyTo(buffer, 5);
+
+                    connectionThread.sendMessage(buffer);
                     break;
                 case 3:
+                    
                     break;
+                    //방 생성
                 case 4:
                     try{
                         roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], argumentList[3]);
@@ -212,6 +224,7 @@ namespace AvalonServer
                     }
                     
                     break;
+                    //방 접속
                 case 5:
                     try
                     {
@@ -243,19 +256,19 @@ namespace AvalonServer
             switch (opcode)
             {
                 //플레이어 정보
-                case 0:
+                case 1:
                     string nick;
                     localDB.getUserNick(int.Parse(argumentList[0]), out nick);
-                    message = formNumber + "00" + "02" + nick + delimiter + argumentList[0];
+                    message = formNumber + "01" + "02" + nick + delimiter + argumentList[0];
                     break;
                     // 호스트 IP
-                case 1:
+                case 2:
                     break;
                     // 플레이어 전적
-                case 2:
+                case 3:
                     int win, lose;
                     result = localDB.getWinLose(int.Parse(argumentList[0]),out win, out lose);
-                    message = formNumber + "02" + "02" + win.ToString() + delimiter + lose.ToString();
+                    message = formNumber + "03" + "02" + win.ToString() + delimiter + lose.ToString();
                     break;
             }
 

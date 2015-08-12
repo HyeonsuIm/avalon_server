@@ -25,6 +25,11 @@ namespace AvalonServer
         // 클라이언트 ip
         String clientIp;
 
+        public string userId
+        {
+            get;
+            set;
+        }
         // 유저 닉네임
         public string userNick
         {
@@ -45,10 +50,10 @@ namespace AvalonServer
         /// </summary>
         /// <param name="listener">클라이언트 정보를 수신한 Listener</param>
         /// <param name="manage">클라이언트 정보를 관리하는 쓰레드풀</param>
-        public ConnectionThread(ref TcpListener listener, ThreadPoolManage manage)
+        public ConnectionThread(ref TcpListener listener, ThreadPoolManage threadPool)
         {
             threadListener = listener;
-            threadPoolManage = manage;
+            threadPoolManage = threadPool;
         }
         
         /// <summary>
@@ -56,6 +61,11 @@ namespace AvalonServer
         /// </summary>
         void connect()
         {
+            //임시 저장 데이터
+            userId = "1111";
+            userNick = "avalon";
+
+
             client = threadListener.AcceptTcpClient();
 
             connections++;
@@ -104,6 +114,7 @@ namespace AvalonServer
                     
                     CommunicationForm comm = analysor.separateOpcode();
                     comm.connectionThread = this;
+                    comm.threadPoolManage = threadPoolManage;
                     comm.process();
 
                     if (comm.formNumber == 0)
@@ -118,7 +129,7 @@ namespace AvalonServer
                     Console.WriteLine("{0} : {1}", clientIp, receiveString);
                     
                 }
-                catch (ArgumentException)
+                catch (ArgumentException e)
                 {
                     Console.WriteLine("<error>");
                     Console.WriteLine("argument count incorrect\n");
@@ -142,6 +153,12 @@ namespace AvalonServer
             Console.WriteLine("{0}\n",data);
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             ns.Write(byteData, 0, byteData.Length);
+        }
+        public void sendMessage(byte[] data)
+        {
+            Console.WriteLine("<send Message>");
+            //Console.WriteLine("{0}\n", Encoding.ASCII.GetString(data));
+            ns.Write(data, 0, data.Length);
         }
     }
 }

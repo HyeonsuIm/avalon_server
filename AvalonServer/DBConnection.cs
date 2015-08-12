@@ -118,7 +118,7 @@ namespace AvalonServer
             return 0;
         }
 
-        public void insertUser(string userIndex)
+        public void insertUser(int userIndex)
         {
             query = "insert into winlate(U_index) values(" + userIndex + ")";
 
@@ -202,8 +202,8 @@ namespace AvalonServer
             if (ds.Tables[0].Rows.Count != 0)
             {
                 DataRow dr = ds.Tables[0].Rows[0];
-                win = int.Parse((string)dr["W_win"]);
-                lose = int.Parse((string)dr["W_lose"]);
+                win = int.Parse(dr["W_win"].ToString());
+                lose = int.Parse(dr["W_lose"].ToString());
             }
             else
             {

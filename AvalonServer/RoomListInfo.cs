@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace AvalonServer
 {
+    [Serializable]
     public class RoomListInfo 
     {
         // 방 개수 증가폭
@@ -25,11 +26,19 @@ namespace AvalonServer
         
         public RoomListInfo()
         {
+            roomCount = 0;
             roomMaxSize = IDwidth;
             roomInfo = new RoomInfo[roomMaxSize];
             roomNumberUsed = new bool[roomMaxSize];
         }
-        
+
+        public bool isNull()
+        {
+            if (roomCount == 0)
+                return true;
+            else
+                return false;
+        }
         /// <summary>
         /// 새로운 방을 추가
         /// </summary>
@@ -55,6 +64,7 @@ namespace AvalonServer
             }
             roomInfo[number] = new RoomInfo();
             roomInfo[number].createRoom(name, type, password, memberId);
+            roomCount++;
         }
 
         public void comeInRoom(string userId, int roomNumber, string password)
@@ -71,6 +81,7 @@ namespace AvalonServer
         {
             roomInfo[number] = null;
             roomNumberUsed[number] = false;
+            roomCount--;
         }
 
         public RoomInfo[] getRoomListInfo()
@@ -79,6 +90,7 @@ namespace AvalonServer
         }
     }
 
+    [Serializable]
     public class RoomInfo
     {
         const int MAX_MEMBER_COUNT = 6;

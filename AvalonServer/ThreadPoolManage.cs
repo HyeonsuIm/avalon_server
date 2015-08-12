@@ -26,9 +26,10 @@ namespace AvalonServer
         /// <summary>
         /// 쓰레드풀관리를 위한 초기화
         /// </summary>
-        public ThreadPoolManage()
+        public ThreadPoolManage(RoomListInfo roomListInfo)
         {
             ServerMain.DBC.connect();
+            this.roomListInfo = roomListInfo;
             clientList = new List<ConnectionThread>();
             client = new TcpListener(IPAddress.Any, 9050);
             client.Start();
