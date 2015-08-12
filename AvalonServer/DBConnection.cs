@@ -118,6 +118,14 @@ namespace AvalonServer
             return 0;
         }
 
+        public void insertUser(string userIndex)
+        {
+            query = "insert into winlate(U_index) values(" + userIndex + ")";
+
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
+        }
+
         public void selectUser(string id, string pwd, out string result, out string nick)
         {
             query = "select U_Index,U_Nick from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";

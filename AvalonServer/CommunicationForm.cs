@@ -15,11 +15,6 @@ namespace AvalonServer
 
         public CommunicationForm(){}
 
-        public ThreadPoolManage threadPoolManage
-        {
-            get;
-            set;
-        }
         public ConnectionThread connectionThread
         {
             get;
@@ -45,11 +40,6 @@ namespace AvalonServer
             get;
             set;
         }
-        public DBConnection DBC
-        {
-            get;
-            set;
-        }
         public RoomListInfo roomListInfo
         {
             get;
@@ -68,6 +58,7 @@ namespace AvalonServer
         string query;
         string result;
         string userNick;
+        DBConnection localDB = ServerMain.DBC;
 
         public LoginForm() {
             formNumber = 0;
@@ -80,7 +71,7 @@ namespace AvalonServer
             {
                 // 로그인 요청
                 case 10:
-                    DBC.selectUser(argumentList[0], argumentList[1], out result, out userNick);
+                    localDB.selectUser(argumentList[0], argumentList[1], out result, out userNick);
                     if (result != "")
                     {
                         result = "" + formNumber + opcode + "01" + result;
@@ -97,9 +88,9 @@ namespace AvalonServer
                 case 11:
                     query = "select U_id from user where U_id = '"+argumentList[0]+"'";
                     result = "" + formNumber + opcode;
-                    DBC.setQuery(query);
+                    localDB.setQuery(query);
 
-                    result += "01" + DBC.executeNonQuery();
+                    result += "01" + localDB.executeNonQuery();
 
                     connectionThread.sendMessage(result);
                     break;
@@ -107,9 +98,9 @@ namespace AvalonServer
                 case 12:
                     query = "select U_id from user where U_Nick = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
-                    DBC.setQuery(query);
+                    localDB.setQuery(query);
 
-                    result += "01" + DBC.executeNonQuery();
+                    result += "01" + localDB.executeNonQuery();
 
                     connectionThread.sendMessage(result);
                     break;
@@ -117,21 +108,21 @@ namespace AvalonServer
                 case 13:
                     query = "select U_id from user where U_Mail = '" + argumentList[0] + "'";
                     result = "" + formNumber + opcode;
-                    DBC.setQuery(query);
+                    localDB.setQuery(query);
 
-                    result += "01" + DBC.executeNonQuery();
+                    result += "01" + localDB.executeNonQuery();
 
                     connectionThread.sendMessage(result);
                     break;
                 // 회원가입
                 case 14:
                     result = "" + formNumber + opcode + "01";
-                    result += DBC.insertUser(argumentList, argumentList.Length);
+                    result += localDB.insertUser(argumentList, argumentList.Length);
                     connectionThread.sendMessage(result);
                     break;
                 // 아이디 찾기
                 case 15:
-                    result = DBC.selectUser(argumentList[0]);
+                    result = localDB.selectUser(argumentList[0]);
                     if (result == "")
                         result = "" + formNumber + opcode + "01" + "0";
                     else
@@ -140,11 +131,11 @@ namespace AvalonServer
                     break;
                 // 비밀번호 찾기
                 case 16:
-                    result = DBC.selectUser(argumentList[0], argumentList[1]);
+                    result = localDB.selectUser(argumentList[0], argumentList[1]);
                     if (result == "1")
                     {
                         Confirm confirm = new Confirm(argumentList[1]);
-                        DBC.updateUser(argumentList[0], Encryption(confirm.getPassword().ToString()));
+                        localDB.updateUser(argumentList[0], Encryption(confirm.getPassword().ToString()));
                         result = "" + formNumber + opcode + "01" + "1";
                     }
                     else
@@ -186,18 +177,19 @@ namespace AvalonServer
         {
             formNumber = 1;
         }
-
+        ThreadPoolManage threadPoolManage = ServerMain.threadPool;
         override public void process()
         {
             switch (opcode)
             {
                 // 채팅
                 case 0:
-                    threadPoolManage.sendToAll("10002" + argumentList[0] + delimiter + argumentList[1]);
+                    threadPoolManage.sendToAll(formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
                     break;
                 // 귓속말
                 case 1:
-                    threadPoolManage.sendToUser("", "10101" + argumentList[0]);
+                    threadPoolManage.sendToUser(argumentList[1], formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
+                    connectionThread.sendMessage(formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
                     break;
                 //방정보 요청
                 case 2:
@@ -265,4 +257,3 @@ namespace AvalonServer
         }
     }
 }
-

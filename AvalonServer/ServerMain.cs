@@ -6,14 +6,18 @@ using System.Net;
 
 namespace AvalonServer
 {
+    
     class ServerMain
     {
+        public static DBConnection DBC = new DBConnection();
+        public static ThreadPoolManage threadPool;
         static void Main(string[] args)
         {
             Console.WriteLine("---------------Server Start----------------");
-            DBConnection DBC = new DBConnection();
             RoomListInfo roomListInfo = new RoomListInfo();
-            ThreadPoolManage threadPool = new ThreadPoolManage(DBC , roomListInfo);
+            threadPool = new ThreadPoolManage();
+            threadPool.roomListInfo = roomListInfo;
+            
         }
     }
 }

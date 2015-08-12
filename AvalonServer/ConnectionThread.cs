@@ -103,10 +103,7 @@ namespace AvalonServer
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     CommunicationForm comm = analysor.separateOpcode();
-                    comm.threadPoolManage = threadPoolManage;
                     comm.connectionThread = this;
-                    comm.DBC = threadPoolManage.DBC;
-                    comm.roomListInfo = threadPoolManage.roomListInfo;
                     comm.process();
 
                     if (comm.formNumber == 0)

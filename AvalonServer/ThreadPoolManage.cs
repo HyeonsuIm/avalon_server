@@ -18,18 +18,17 @@ namespace AvalonServer
         // 클라이언트 접속 대기를 위한 객체
         private TcpListener client;
 
-        // DB연동을 위한 DBConnection 객체
-        public DBConnection DBC;
-
-        public RoomListInfo roomListInfo;
+        public RoomListInfo roomListInfo
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// 쓰레드풀관리를 위한 초기화
         /// </summary>
-        public ThreadPoolManage(DBConnection DBC, RoomListInfo roomListInfo)
+        public ThreadPoolManage()
         {
-            this.DBC = DBC;
-            this.roomListInfo = roomListInfo;
-            DBC.connect();
+            ServerMain.DBC.connect();
             clientList = new List<ConnectionThread>();
             client = new TcpListener(IPAddress.Any, 9050);
             client.Start();
@@ -43,7 +42,7 @@ namespace AvalonServer
                 ConnectionThread newConnection = new ConnectionThread(ref client, this);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(newConnection.HandleConnection));
             }
-        } 
+        }
 
         /// <summary>
         /// 현재 접속중인 사용자 모두에게 데이터 전송
