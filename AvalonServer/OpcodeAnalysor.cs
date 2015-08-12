@@ -8,7 +8,7 @@ namespace AvalonServer
 {
     class OpcodeAnalysor
     {
-        enum FormNumber : int{ Login,Lobby,Game,Shutdown=9}; // 통신 규약에 따른 각 폼의 번호
+        enum FormNumber : int { Login, Lobby, Game, playerInfo = 8, Shutdown }; // 통신 규약에 따른 각 폼의 번호
         string dataString;
 
 
@@ -42,6 +42,9 @@ namespace AvalonServer
                     break;
                 case FormNumber.Shutdown:
                     form = new ShutdownForm();
+                    break;
+                case FormNumber.playerInfo:
+                    form = new PlayerInfoProcess();
                     break;
                 default:
                     form = new LoginForm();

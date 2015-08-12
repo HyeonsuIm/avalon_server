@@ -192,6 +192,48 @@ namespace AvalonServer
 
         }
 
+        public int getWinLose(int index, out int win, out int lose)
+        {
+            query = "select W_win,W_lose from winlate where U_index=" + index + "";
+            da = new MySqlDataAdapter(query, conn);
+            ds = new DataSet();
+            da.Fill(ds);
+
+            if (ds.Tables[0].Rows.Count != 0)
+            {
+                DataRow dr = ds.Tables[0].Rows[0];
+                win = int.Parse((string)dr["W_win"]);
+                lose = int.Parse((string)dr["W_lose"]);
+            }
+            else
+            {
+                win = 0;
+                lose = 0;
+                return 1;
+            }
+            return 0;
+        }
+
+        public int getUserNick(int receiveIndex, out string nick)
+        {
+            query = "select U_Nick from user where U_index=" + receiveIndex + "";
+            da = new MySqlDataAdapter(query, conn);
+            ds = new DataSet();
+            da.Fill(ds);
+
+            if (ds.Tables[0].Rows.Count != 0)
+            {
+                DataRow dr = ds.Tables[0].Rows[0];
+                nick = (string)dr["U_Nick"];
+                return 0;
+            }
+            else
+            {
+                nick = "";
+                return 1;
+            }
+        }
+
         public void updateUser(string id, string password)
         {
             try

@@ -228,10 +228,49 @@ namespace AvalonServer
         }
     }
 
+    class PlayerInfoProcess : CommunicationForm
+    {
+        DBConnection localDB = ServerMain.DBC;
+        int result;
+        string message;
+        public PlayerInfoProcess()
+        {
+            formNumber = 8;
+        }
+
+        override public void process()
+        {
+            switch (opcode)
+            {
+                //플레이어 정보
+                case 0:
+                    string nick;
+                    localDB.getUserNick(int.Parse(argumentList[0]), out nick);
+                    message = formNumber + "00" + "02" + nick + delimiter + argumentList[0];
+                    break;
+                    // 호스트 IP
+                case 1:
+                    break;
+                    // 플레이어 전적
+                case 2:
+                    int win, lose;
+                    result = localDB.getWinLose(int.Parse(argumentList[0]),out win, out lose);
+                    message = formNumber + "02" + "02" + win.ToString() + delimiter + lose.ToString();
+                    break;
+            }
+
+            if (result == 0)
+                connectionThread.sendMessage(message);
+            else if (result == 1)
+                connectionThread.sendMessage(formNumber + "03" + "01" + "colum missing");
+        }
+        
+    }
+
+
     /// <summary>
     /// 종료 요청 처리
     /// </summary>
-
     class ShutdownForm : CommunicationForm
     {
         public ShutdownForm()
