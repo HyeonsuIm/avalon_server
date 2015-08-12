@@ -193,7 +193,7 @@ namespace AvalonServer
             {
                 // 채팅
                 case 0:
-                    threadPoolManage.sendToAll("10001" + argumentList[0]);
+                    threadPoolManage.sendToAll("10002" + argumentList[0] + delimiter + argumentList[1]);
                     break;
                 // 귓속말
                 case 1:
