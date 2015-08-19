@@ -75,13 +75,14 @@ namespace AvalonServer
             string argument = dataString.Substring(5);
             string[] argumentList;
             int argumentCount = int.Parse(dataString.Substring(3, 2));
-            argumentList = argument.Split('\u0001');
-            Console.WriteLine("argument : {0}\n", argument);
             if (argumentCount == 0)
             {
                 return null;
             }
-            else if (argumentCount != argumentList.Length)
+            argumentList = argument.Split('\u0001');
+            Console.WriteLine("argument : {0}\n", argument);
+            
+            if (argumentCount != argumentList.Length)
             {
                 throw new ArgumentException();
             }

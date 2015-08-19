@@ -113,6 +113,10 @@ namespace AvalonServer
                     {
                         userNick = ((LoginForm)comm).getNick();
                     }
+                    if (comm.formNumber == 9 && comm.opcode == 0)
+                    {
+                        break;
+                    }
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIp, receiveString);
                     
@@ -131,7 +135,7 @@ namespace AvalonServer
                 }
                 Console.WriteLine("********************message process complete*********************\n");
             }
-            
+            Console.WriteLine("********************message process complete*********************\n");
             disConnect();
         }
 
