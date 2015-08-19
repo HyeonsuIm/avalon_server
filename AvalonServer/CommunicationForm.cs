@@ -128,16 +128,14 @@ namespace AvalonServer
                     break;
                 // 아이디 찾기
                 case 15:
-                    result = localDB.selectUser(argumentList[0]);
-                    if (result == "")
-                        result = "" + formNumber + opcode + "01" + "0";
-                    else
-                        result = "" + formNumber + opcode + "01" + result;
+                    result = "" + formNumber + opcode + "01" + localDB.selectUser(argumentList[0]);
                     connectionThread.sendMessage(result);
                     break;
                 // 비밀번호 찾기
                 case 16:
-                    result = localDB.selectUser(argumentList[0], argumentList[1]);
+                    query = "select U_Index from user where U_Id='" + argumentList[0] + "' and U_mail='" + argumentList[1] + "'";
+                    localDB.setQuery(query);
+                    result = localDB.executeNonQuery();
                     if (result == "1")
                     {
                         Confirm confirm = new Confirm(argumentList[1]);
@@ -269,9 +267,9 @@ namespace AvalonServer
                     break;
                     // 플레이어 전적
                 case 3:
-                    int win, lose;
-                    result = localDB.getWinLose(int.Parse(argumentList[0]),out win, out lose);
-                    message = formNumber + "03" + "02" + win.ToString() + delimiter + lose.ToString();
+                    int win, lose , draw;
+                    result = localDB.getWinLose(int.Parse(argumentList[0]),out win, out lose, out draw);
+                    message = formNumber + "03" + "03" + win.ToString() + delimiter + lose.ToString() + delimiter + draw.ToString();
                     break;
             }
 
