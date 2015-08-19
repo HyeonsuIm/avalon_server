@@ -90,15 +90,9 @@ namespace AvalonServer
             }
             return result;
         }
-        public int insertUser(string[] argumentList, int argumentCount)
+        public int insertUser()
         {
             try {
-                query = "insert into user(U_Id,U_Pw,U_Nick,U_Mail) values('" + argumentList[0] + "'";
-                for (int i = 1; i < argumentCount; i++) {
-                    query += ",'" + argumentList[i] + "'";
-                }
-                query += ")";
-            
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
             }

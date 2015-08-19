@@ -125,8 +125,14 @@ namespace AvalonServer
                     break;
                 // 회원가입
                 case 14:
+                    query = "insert into user(U_Id,U_Pw,U_Nick,U_Mail) values('" + argumentList[0] + "'";
+                    for (int i = 1; i < argumentCount; i++) {
+                        query += ",'" + argumentList[i] + "'";
+                    }
+                    query += ")";
+                    DBC.setQuery(query);
                     result = "" + formNumber + opcode + "01";
-                    result += DBC.insertUser(argumentList, argumentList.Length);
+                    result += DBC.insertUser();
                     connectionThread.sendMessage(result);
                     break;
                 // 아이디 찾기
@@ -239,6 +245,26 @@ namespace AvalonServer
                         Console.WriteLine(e.Message);
                         connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
                     }
+                    break;
+            }
+        }
+    }
+    /// <summary>
+    /// GameForm 요청 처리
+    /// </summary>
+
+    class GameForm : CommunicationForm
+    {
+        public GameForm()
+        {
+            formNumber = 3;
+        }
+
+        public override void process()
+        {
+            switch(opcode)
+            {
+                case 99:
                     break;
             }
         }
