@@ -137,11 +137,7 @@ namespace AvalonServer
                     break;
                 // 아이디 찾기
                 case 15:
-                    result = DBC.selectUser(argumentList[0]);
-                    if (result == "")
-                        result = "" + formNumber + opcode + "01" + "0";
-                    else
-                        result = "" + formNumber + opcode + "01" + result;
+                    result = "" + formNumber + opcode + "01" + DBC.selectUser(argumentList[0]);;
                     connectionThread.sendMessage(result);
                     break;
                 // 비밀번호 찾기

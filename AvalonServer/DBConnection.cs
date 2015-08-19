@@ -19,7 +19,7 @@ namespace AvalonServer
         string ID = "avalon";
         string PW = "AvalonPw";
         string database = "avalon";
-
+        //DB 연결용 함수
         public void connect()
         {
             try {
@@ -38,11 +38,13 @@ namespace AvalonServer
         {
             conn.Close();
         }
-
+        //쿼리문 설정용 함수
         public void setQuery(string str)
         {
             query = str;
         }
+
+        //숫자를 반환하는 함수
         public string executeNonQuery()
         {
 
@@ -62,12 +64,9 @@ namespace AvalonServer
             {
                 result = "9";
             }
-            finally{
-                da.Dispose();
-                ds.Dispose();
-            }
             return result;
         }
+        //회원가입용 insertUser 함수
         public int insertUser()
         {
             try {
@@ -89,7 +88,7 @@ namespace AvalonServer
             }
             return 0;
         }
-
+        //로그인 정보 반환용 selectUser 함수
         public void selectUser(string id, string pwd, out string result, out string nick)
         {
             query = "select U_Index,U_Nick from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";
@@ -109,26 +108,7 @@ namespace AvalonServer
                 nick = "";
             }
         }
-
-        public string selectUser(string id, string email)
-        {
-            string result;
-            query = "select U_Index from user where U_Id='" + id + "' and U_mail='" + email + "'";
-            da = new MySqlDataAdapter(query, conn);
-            ds = new DataSet();
-            da.Fill(ds);
-
-            if (ds.Tables[0].Rows.Count != 0)
-            {
-                DataRow dr = ds.Tables[0].Rows[0];
-                result = "1";
-            }
-            else
-                result = "0";
-
-            return result;
-        }
-
+        //아이 찾기용 selectUser 함수
         public string selectUser(string email) {
             string result;
             query = "select U_Id from user where U_Mail='" + email + "'";
@@ -143,13 +123,13 @@ namespace AvalonServer
             }
             else
             {
-                result = "";
+                result = "0";
             }
             
             return result;
 
         }
-
+        //비밀번호 변경용 updateuser 함수
         public void updateUser(string id, string password)
         {
             try
