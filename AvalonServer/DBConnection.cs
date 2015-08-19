@@ -136,9 +136,6 @@ namespace AvalonServer
                 result = "";
                 nick = "";
             }
-
-            ds.Dispose();
-            da.Dispose();
         }
 
         public string selectUser(string id, string email)
@@ -176,9 +173,6 @@ namespace AvalonServer
             {
                 result = "";
             }
-
-            ds.Dispose();
-            da.Dispose();
             
             return result;
 
