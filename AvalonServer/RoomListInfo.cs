@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AvalonServer
 {
     [Serializable]
-    public class RoomListInfo 
+    public class RoomListInfo
     {
         // 방 개수 증가폭
         const int IDwidth = 20;
@@ -23,7 +23,7 @@ namespace AvalonServer
 
         // 번호 사용 여부
         bool[] roomNumberUsed;
-        
+
         public RoomListInfo()
         {
             roomCount = 0;
@@ -49,7 +49,8 @@ namespace AvalonServer
         public void addRoom(int type, string name, string password, string memberId)
         {
             int number;
-            for (number = 0; number < roomMaxSize; number++) {
+            for (number = 0; number < roomMaxSize; number++)
+            {
                 if (roomNumberUsed[number] == false)
                 {
                     roomNumberUsed[number] = true;
@@ -87,6 +88,11 @@ namespace AvalonServer
         public RoomInfo[] getRoomListInfo()
         {
             return roomInfo;
+        }
+
+        public int getRoomCount()
+        {
+            return roomCount;
         }
     }
 
@@ -142,9 +148,9 @@ namespace AvalonServer
             roomInfo[1] = type.ToString();
             roomInfo[2] = password;
             roomInfo[3] = memberCount.ToString();
-            for(int i = 0; i < memberList.Length; i++)
+            for (int i = 0; i < memberList.Length; i++)
             {
-                roomInfo[i+4] = memberList[i - 5];
+                roomInfo[i + 4] = memberList[i - 5];
             }
             return roomInfo;
         }

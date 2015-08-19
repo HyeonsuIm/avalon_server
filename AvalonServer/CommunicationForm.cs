@@ -201,13 +201,16 @@ namespace AvalonServer
                 case 2:
                     BinaryFormatter bf = new BinaryFormatter();
                     MemoryStream ms = new MemoryStream();
-                    bf.Serialize(ms, threadPoolManage.roomListInfo);
-                    
+                    bf.Serialize(ms, threadPoolManage.roomListInfo); 
+
+                    ms.Position = 0;
+
+                    RoomListInfo rm = (RoomListInfo)bf.Deserialize(ms);
+
                     int msSize = ms.ToArray().Length;
                     byte[] buffer = new byte[msSize+5];
-                    Encoding.ASCII.GetBytes("10202").CopyTo(buffer, 0);
-                    ms.ToArray().CopyTo(buffer, 5);
-
+                    Encoding.UTF8.GetBytes("10202").CopyTo(buffer, 0);
+                    ms.ToArray().CopyTo(buffer,5);
                     connectionThread.sendMessage(buffer);
                     break;
                 case 3:
