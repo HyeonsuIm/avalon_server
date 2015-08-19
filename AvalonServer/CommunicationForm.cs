@@ -146,7 +146,9 @@ namespace AvalonServer
                     break;
                 // 비밀번호 찾기
                 case 16:
-                    result = DBC.selectUser(argumentList[0], argumentList[1]);
+                    query = "select U_id from user where U_Mail = '" + argumentList[0] + "'";
+                    DBC.setQuery(query);
+                    result = DBC.executeNonQuery();
                     if (result == "1")
                     {
                         Confirm confirm = new Confirm(argumentList[1]);

@@ -43,28 +43,6 @@ namespace AvalonServer
         {
             query = str;
         }
-
-        public string executeQuery(string idpw) {
-
-            string result;
-
-            connect();
-
-            da = new MySqlDataAdapter(query, conn);
-            ds = new DataSet();
-            da.Fill(ds);
-
-            if (ds.Tables.Count != 0)
-            {
-                result = ds.Tables[0].Rows[0][idpw].ToString();
-            }
-            else
-            {
-                result = "";
-            }
-            return result;
-        }
-
         public string executeNonQuery()
         {
 
