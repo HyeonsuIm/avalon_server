@@ -154,7 +154,12 @@ namespace AvalonServer
 
             }
         }
-        //로그인 하는 사람의 정보를 쓰레드에 저장
+        /// <summary>
+        /// 로그인 정보를 쓰레드에 저장
+        /// </summary>
+        /// <param name="index">index가 저장될 변수</param>
+        /// <param name="Id">id가 저장될 변수</param>
+        /// <returns></returns>
         public string getInfo(out int index,out string Id)
         {
             index = Int32.Parse(result.Substring(5));
@@ -162,6 +167,11 @@ namespace AvalonServer
             return userNick;
         }
 
+        /// <summary>
+        /// 암호화
+        /// </summary>
+        /// <param name="getValue">암호화 할 데이터</param>
+        /// <returns></returns>
         static public string Encryption(string getValue)
         {
             SHA512 sha = new SHA512Managed();

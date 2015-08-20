@@ -62,12 +62,6 @@ namespace AvalonServer
             mail.Subject = EmailHead;
             mail.Body = EmailBody + confirmNum.ToString() + EmailBody2;
             
-            //smtp.Port = SmtpPort;
-            //smtp.UseDefaultCredentials = true;              // 기본 자격증명 사용여부
-            //smtp.EnableSsl = true;                          // ssl 사용
-            //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-            //smtp.Credentials = new NetworkCredential(SmtpID, SmtpPW);
-            //smtp.Credentials = new System.Net.NetworkCredential(@"rikuo777@gmail.com", "hayate123");
             try
             {
                 smtp.Send(mail);

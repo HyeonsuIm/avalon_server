@@ -12,6 +12,7 @@ namespace AvalonServer
 
         // 클라이언트 접속 유지를 위한 객체
         Socket client;
+        // 클라이언트 접속 IP
         IPEndPoint clientIpep;
 
         //유저 정보
@@ -30,8 +31,8 @@ namespace AvalonServer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="listener">클라이언트 정보를 수신한 Listener</param>
-        /// <param name="manage">클라이언트 정보를 관리하는 쓰레드풀</param>
+        /// <param name="client">클라이언트에 연결 된 소켓 객체</param>
+        /// <param name="threadPool">클라이언트 연결을 관리할 쓰레드 풀</param>
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
             this.client = client;
@@ -73,17 +74,24 @@ namespace AvalonServer
             while (true)
             {
                 try {
+                    // 데이터 수신 대기 및 수신
                     data = receiveVarData();
 
                     Console.WriteLine("\n********************message receive*********************");
+
+                    // 수신 된 데이터를 분석하기 위한 객체 생성
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
+                    // 데이터를 양식에 맞게 분할
                     CommunicationForm comm = analysor.separateOpcode();
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
+
+                    // 분할된 데이터 처리
                     comm.process();
 
+                    // 예외처리
                     if (comm.formNumber == 0 && comm.opcode == 10)
                     {
                        userNick = ((LoginForm)comm).getInfo(out userIndex, out userId);
@@ -92,6 +100,8 @@ namespace AvalonServer
                     {
                         break;
                     }
+
+                    // 수신된 데이터 출력
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
                     
@@ -111,9 +121,15 @@ namespace AvalonServer
                 Console.WriteLine("********************message process complete*********************\n");
             }
             Console.WriteLine("********************message process complete*********************\n");
+
+            // 연결 종료
             disConnect();
         }
 
+        /// <summary>
+        /// string 데이터 송신
+        /// </summary>
+        /// <param name="data">송신할 문자열</param>
         public void sendMessage(string data)
         {
             Console.WriteLine("<send Message>");
@@ -121,6 +137,11 @@ namespace AvalonServer
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             sendVarData(byteData);
         }
+
+        /// <summary>
+        /// byte 데이터 송신
+        /// </summary>
+        /// <param name="byteData">송신할 데이터</param>
         public void sendMessage(byte[] byteData)
         {
             Console.WriteLine("<send Message>");
@@ -128,6 +149,11 @@ namespace AvalonServer
             sendVarData(byteData);
         }
 
+        /// <summary>
+        /// 가변 데이터 송신
+        /// </summary>
+        /// <param name="data">송신할 데이터</param>
+        /// <returns>송신 데이터의 크기</returns>
         private int sendVarData(byte[] data)
         {
             int total = 0;
@@ -149,6 +175,10 @@ namespace AvalonServer
             return total;
         }
 
+        /// <summary>
+        /// 가변 데이터 수신
+        /// </summary>
+        /// <returns>수신된 데이터</returns>
         private byte[] receiveVarData(){
             int total = 0;
             int recv;
