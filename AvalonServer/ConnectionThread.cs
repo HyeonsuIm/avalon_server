@@ -115,6 +115,7 @@ namespace AvalonServer
                     CommunicationForm comm = analysor.separateOpcode();
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
+                    comm.roomListInfo = threadPoolManage.roomListInfo;
                     comm.process();
 
                     if (comm.formNumber == 0)
