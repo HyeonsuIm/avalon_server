@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -6,48 +7,20 @@ namespace AvalonServer
 {
     class ConnectionThread
     {
-        // 클라이언트 접속을 위한 객체
-        public TcpListener threadListener;
-
         // 쓰레드들을 관리할 객체
         public ThreadPoolManage threadPoolManage;
 
         // 클라이언트 접속 유지를 위한 객체
-        TcpClient client;
+        Socket client;
+        IPEndPoint clientIpep;
 
-        // 클라이언트와의 데이터 전송을 위한 객체
-        public NetworkStream ns
-        {
-            get;
-            set;
-        }
+        //유저 정보
         public string userId;
         public string userNick;
         public int userIndex;
 
-        // 클라이언트 ip
-        String clientIp;
-        /*
-        public string userId
-        {
-            get;
-            set;
-        }
-        // 유저 닉네임
-        public string userNick
-        {
-            get;
-            set;
-        }
-        // 유저 Index
-        public int userIndex
-        {
-            get;
-            set;
-        }
-*/
         // 데이터 송수신용
-        byte[] data = new byte[1024];
+        byte[] data;
 
         // 연결 수
         private static int connections = 0;
@@ -59,9 +32,9 @@ namespace AvalonServer
         /// </summary>
         /// <param name="listener">클라이언트 정보를 수신한 Listener</param>
         /// <param name="manage">클라이언트 정보를 관리하는 쓰레드풀</param>
-        public ConnectionThread(ref TcpListener listener, ThreadPoolManage threadPool)
+        public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
-            threadListener = listener;
+            this.client = client;
             threadPoolManage = threadPool;
         }
         
@@ -70,17 +43,13 @@ namespace AvalonServer
         /// </summary>
         void connect()
         {
-            client = threadListener.AcceptTcpClient();
-
             connections++;
             threadPoolManage.addClient(this);
 
-            ns = client.GetStream();
-            clientIp = client.Client.RemoteEndPoint.ToString();
-            Console.WriteLine("New Client connect\nip : {0}\nconnections : {1}\n", clientIp, connections);
+            clientIpep = (IPEndPoint)client.RemoteEndPoint;
+            Console.WriteLine("New Client connect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
             
-            data = Encoding.UTF8.GetBytes("connection success");
-            ns.Write(data, 0, data.Length);
+            sendMessage("connection sucess");
         }
         
         /// <summary>
@@ -88,12 +57,10 @@ namespace AvalonServer
         /// </summary>
         void disConnect()
         {
-            
-            ns.Close();
             client.Close();
             threadPoolManage.removeClient(this);
             connections--;
-            Console.WriteLine("Client disconnect\nip : {0}\nconnections : {1}\n", clientIp, connections);
+            Console.WriteLine("Client disconnect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
         }
 
         /// <summary>
@@ -102,16 +69,11 @@ namespace AvalonServer
         /// <param name="state"></param>
         public void HandleConnection(Object state)
         {
-            int recv;
             connect();
             while (true)
             {
-                data = new byte[1024];
                 try {
-
-                    recv = ns.Read(data, 0, data.Length);
-                    if (recv == 0)
-                        break;
+                    data = receiveVarData();
 
                     Console.WriteLine("\n********************message receive*********************");
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
@@ -122,7 +84,7 @@ namespace AvalonServer
                     comm.roomListInfo = threadPoolManage.roomListInfo;
                     comm.process();
 
-                    if (comm.formNumber == 0)
+                    if (comm.formNumber == 0 && comm.opcode == 10)
                     {
                        userNick = ((LoginForm)comm).getInfo(out userIndex, out userId);
                     }
@@ -131,7 +93,7 @@ namespace AvalonServer
                         break;
                     }
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
-                    Console.WriteLine("{0} : {1}", clientIp, receiveString);
+                    Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
                     
                 }
                 catch (ArgumentException e)
@@ -155,15 +117,58 @@ namespace AvalonServer
         public void sendMessage(string data)
         {
             Console.WriteLine("<send Message>");
-            Console.WriteLine("{0}\n",data);
+            Console.WriteLine("{0}\n", data);
             byte[] byteData = Encoding.ASCII.GetBytes(data);
-            ns.Write(byteData, 0, byteData.Length);
+            sendVarData(byteData);
         }
-        public void sendMessage(byte[] data)
+        public void sendMessage(byte[] byteData)
         {
             Console.WriteLine("<send Message>");
             //Console.WriteLine("{0}\n", Encoding.ASCII.GetString(data));
-            ns.Write(data, 0, data.Length);
+            sendVarData(byteData);
+        }
+
+        private int sendVarData(byte[] data)
+        {
+            int total = 0;
+            int size = data.Length;
+
+            int dataleft = size;
+            int sent;
+
+            byte[] datasize = new byte[4];
+            datasize = BitConverter.GetBytes(size);
+            sent = client.Send(datasize);
+
+            while (total < size)
+            {
+                sent = client.Send(data, total, dataleft, SocketFlags.None);
+                total += sent;
+                dataleft = -sent;
+            }
+            return total;
+        }
+
+        private byte[] receiveVarData(){
+            int total = 0;
+            int recv;
+            byte[] datasize = new byte[4];
+            recv = client.Receive(datasize,0,4,0);
+            int size = BitConverter.ToInt32(datasize,0);
+            int dataleft = size;
+            byte[] data = new byte[size];
+
+            while(total < size){
+                recv = client.Receive(data,total,dataleft,0);
+                if(recv == 0)
+                {
+                    data = Encoding.UTF8.GetBytes("exit");
+                    break;
+                }
+                total += recv;
+                dataleft -= recv;
+            }
+            return data;
         }
     }
 }

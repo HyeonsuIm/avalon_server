@@ -15,9 +15,6 @@ namespace AvalonServer
         // 클라이언트 정보를 관리할 리스트
         List<ConnectionThread> clientList;
 
-        // 클라이언트 접속 대기를 위한 객체
-        private TcpListener client;
-
         public RoomListInfo roomListInfo
         {
             get;
@@ -30,17 +27,23 @@ namespace AvalonServer
         {
             ServerMain.DBC.connect();
             this.roomListInfo = roomListInfo;
+
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 9050);
+            Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverSocket.Bind(ipep);
+            serverSocket.Listen(10);
+
+            
+            
             clientList = new List<ConnectionThread>();
-            client = new TcpListener(IPAddress.Any, 9050);
-            client.Start();
+            //client = new TcpListener(IPAddress.Any, 9050);
+            //client.Start();
 
             while (true)
             {
-                while (!client.Pending())
-                {
-                    Thread.Sleep(1000);
-                }
-                ConnectionThread newConnection = new ConnectionThread(ref client, this);
+                Socket clientSocket = serverSocket.Accept();
+
+                ConnectionThread newConnection = new ConnectionThread(ref clientSocket, this);
                 ThreadPool.QueueUserWorkItem(new WaitCallback(newConnection.HandleConnection));
             }
         }
@@ -52,11 +55,9 @@ namespace AvalonServer
         /// <param name="length">데이터 길이</param>
         public void sendToAll(string data)
         {
-            byte[] byteData = Encoding.UTF8.GetBytes(data);
             for (int i = 0; i < clientList.Count; i++) {
                 try {
-                    NetworkStream ns = clientList.ElementAt(i).ns;
-                    ns.Write(byteData, 0, byteData.Length);
+                    clientList.ElementAt(i).sendMessage(data);
                 }catch(ObjectDisposedException e)
                 {
                     removeClient(i);
@@ -67,12 +68,10 @@ namespace AvalonServer
 
         public void sendToUser(string user, string data)
         {
-            byte[] byteData = Encoding.UTF8.GetBytes(data);
             for(int i=0;i<clientList.Count;i++){
                 if (user == clientList.ElementAt(i).userNick)
                 {
-                    NetworkStream ns = clientList.ElementAt(i).ns;
-                    ns.Write(byteData, 0, byteData.Length);
+                    clientList.ElementAt(i).sendMessage(data);
                 }
             }
         }
