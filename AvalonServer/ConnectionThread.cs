@@ -21,10 +21,13 @@ namespace AvalonServer
             get;
             set;
         }
+        public string userId;
+        public string userNick;
+        public int userIndex;
 
         // 클라이언트 ip
         String clientIp;
-
+        /*
         public string userId
         {
             get;
@@ -36,7 +39,13 @@ namespace AvalonServer
             get;
             set;
         }
-
+        // 유저 Index
+        public int userIndex
+        {
+            get;
+            set;
+        }
+*/
         // 데이터 송수신용
         byte[] data = new byte[1024];
 
@@ -61,11 +70,6 @@ namespace AvalonServer
         /// </summary>
         void connect()
         {
-            //임시 저장 데이터
-            userId = "1111";
-            userNick = "avalon";
-
-
             client = threadListener.AcceptTcpClient();
 
             connections++;
@@ -120,7 +124,7 @@ namespace AvalonServer
 
                     if (comm.formNumber == 0)
                     {
-                        userNick = ((LoginForm)comm).getNick();
+                       userNick = ((LoginForm)comm).getInfo(out userIndex, out userId);
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {

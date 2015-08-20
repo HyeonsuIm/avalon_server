@@ -64,6 +64,7 @@ namespace AvalonServer
         string query;
         string result;
         string userNick;
+        string userId;
         DBConnection localDB = ServerMain.DBC;
 
         public LoginForm() {
@@ -77,7 +78,7 @@ namespace AvalonServer
             {
                 // 로그인 요청
                 case 10:
-                    localDB.selectUser(argumentList[0], argumentList[1], out result, out userNick);
+                    localDB.selectUser(argumentList[0], argumentList[1], out result, out userNick, out userId);
                     if (result != "")
                     {
                         result = "" + formNumber + opcode + "01" + result;
@@ -153,9 +154,11 @@ namespace AvalonServer
 
             }
         }
-
-        public string getNick()
+        //로그인 하는 사람의 정보를 쓰레드에 저장
+        public string getInfo(out int index,out string Id)
         {
+            index = Int32.Parse(result.Substring(5));
+            Id = userId;
             return userNick;
         }
 

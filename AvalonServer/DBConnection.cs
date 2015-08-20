@@ -101,9 +101,9 @@ namespace AvalonServer
             cmd.ExecuteNonQuery();
         }
 
-        public void selectUser(string id, string pwd, out string result, out string nick)
+        public void selectUser(string id, string pwd, out string result, out string nick, out string userId)
         {
-            query = "select U_Index,U_Nick from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";
+            query = "select U_Index,U_Nick,U_Id from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);
@@ -112,12 +112,14 @@ namespace AvalonServer
             {
                 DataRow dr = ds.Tables[0].Rows[0];
                 result = dr["U_Index"].ToString();
-                nick = (string)dr["U_Nick"];
+                nick = dr["U_Nick"].ToString();
+                userId = dr["U_Id"].ToString();
             }
             else
             {
                 result = "";
                 nick = "";
+                userId = "";
             }
         }
         public string selectUser(string email) {
@@ -130,7 +132,7 @@ namespace AvalonServer
             if (ds.Tables[0].Rows.Count != 0)
             {
                 DataRow dr = ds.Tables[0].Rows[0];
-                result = (string)dr["U_Id"];
+                result = dr["U_Id"].ToString();
             }
             else
             {
@@ -175,7 +177,7 @@ namespace AvalonServer
             if (ds.Tables[0].Rows.Count != 0)
             {
                 DataRow dr = ds.Tables[0].Rows[0];
-                nick = (string)dr["U_Nick"];
+                nick = dr["U_Nick"].ToString();
                 return 0;
             }
             else
