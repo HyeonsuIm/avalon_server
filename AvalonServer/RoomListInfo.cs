@@ -46,7 +46,7 @@ namespace AvalonServer
         /// <param name="type">방 타입</param>
         /// <param name="password">방 비밀번호</param>
         /// <param name="member">방장 이름</param>
-        public void addRoom(int type, string name, string password, string memberId)
+        public void addRoom(int type, string name, string password, string memberId, int maxPerson)
         {
             int number;
             for (number = 0; number < roomMaxSize; number++)
@@ -64,7 +64,7 @@ namespace AvalonServer
                 Array.Resize<bool>(ref roomNumberUsed, roomMaxSize);
             }
             roomInfo[number] = new RoomInfo();
-            roomInfo[number].createRoom(name, type, password, memberId);
+            roomInfo[number].createRoom(name, type, password, memberId, maxPerson, number);
             roomCount++;
         }
 
@@ -99,12 +99,13 @@ namespace AvalonServer
     [Serializable]
     public class RoomInfo
     {
-        const int MAX_MEMBER_COUNT = 6;
+        int maxPerson;
         string name;
         int type;
+        int num;
         string password;
         int memberCount;
-        string[] memberList = new string[MAX_MEMBER_COUNT];
+        string[] memberList;
 
         public void addUser(string userId, string password)
         {
@@ -132,8 +133,11 @@ namespace AvalonServer
             }
         }
 
-        public void createRoom(string name, int type, string password, string memberId)
+        public void createRoom(string name, int type, string password, string memberId, int maxPerson, int number)
         {
+            num = number;
+            this.maxPerson = maxPerson;
+            memberList = new string[maxPerson];
             this.name = name;
             this.type = type;
             this.password = password;
@@ -143,14 +147,16 @@ namespace AvalonServer
 
         public string[] getRoomInfo()
         {
-            string[] roomInfo = new string[11];
+            string[] roomInfo = new string[16];
             roomInfo[0] = name;
             roomInfo[1] = type.ToString();
             roomInfo[2] = password;
             roomInfo[3] = memberCount.ToString();
+            roomInfo[4] = maxPerson.ToString();
+            roomInfo[5] = num.ToString();
             for (int i = 0; i < memberList.Length; i++)
             {
-                roomInfo[i + 4] = memberList[i - 5];
+                roomInfo[i + 6] = memberList[i];
             }
             return roomInfo;
         }
