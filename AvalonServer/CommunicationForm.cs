@@ -242,6 +242,19 @@ namespace AvalonServer
         }
     }
 
+    class GameForm : CommunicationForm
+    {
+        public GameForm()
+        {
+            formNumber = 3;
+        }
+
+        public override void process()
+        {
+            //내용을 추가하자
+        }
+    }
+
     class PlayerInfoProcess : CommunicationForm
     {
         DBConnection localDB = ServerMain.DBC;
