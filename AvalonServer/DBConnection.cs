@@ -44,27 +44,6 @@ namespace AvalonServer
             query = str;
         }
 
-        public string executeQuery(string idpw) {
-
-            string result;
-
-            connect();
-
-            da = new MySqlDataAdapter(query, conn);
-            ds = new DataSet();
-            da.Fill(ds);
-
-            if (ds.Tables.Count != 0)
-            {
-                result = ds.Tables[0].Rows[0][idpw].ToString();
-            }
-            else
-            {
-                result = "";
-            }
-            return result;
-        }
-
         public string executeNonQuery()
         {
 
@@ -83,10 +62,6 @@ namespace AvalonServer
             catch
             {
                 result = "9";
-            }
-            finally{
-                da.Dispose();
-                ds.Dispose();
             }
             return result;
         }
@@ -144,30 +119,7 @@ namespace AvalonServer
                 result = "";
                 nick = "";
             }
-
-            ds.Dispose();
-            da.Dispose();
         }
-
-        public string selectUser(string id, string email)
-        {
-            string result;
-            query = "select U_Index from user where U_Id='" + id + "' and U_mail='" + email + "'";
-            da = new MySqlDataAdapter(query, conn);
-            ds = new DataSet();
-            da.Fill(ds);
-
-            if (ds.Tables[0].Rows.Count != 0)
-            {
-                DataRow dr = ds.Tables[0].Rows[0];
-                result = "1";
-            }
-            else
-                result = "0";
-
-            return result;
-        }
-
         public string selectUser(string email) {
             string result;
             query = "select U_Id from user where U_Mail='" + email + "'";
@@ -182,19 +134,16 @@ namespace AvalonServer
             }
             else
             {
-                result = "";
+                result = "0";
             }
-
-            ds.Dispose();
-            da.Dispose();
             
             return result;
 
         }
 
-        public int getWinLose(int index, out int win, out int lose)
+        public int getWinLose(int index, out int win, out int lose, out int draw)
         {
-            query = "select W_win,W_lose from winlate where U_index=" + index + "";
+            query = "select W_win,W_lose,W_draw from winlate where U_index=" + index + "";
             da = new MySqlDataAdapter(query, conn);
             ds = new DataSet();
             da.Fill(ds);
@@ -204,11 +153,13 @@ namespace AvalonServer
                 DataRow dr = ds.Tables[0].Rows[0];
                 win = int.Parse(dr["W_win"].ToString());
                 lose = int.Parse(dr["W_lose"].ToString());
+                draw = int.Parse(dr["W_draw"].ToString());
             }
             else
             {
                 win = 0;
                 lose = 0;
+                draw = 0;
                 return 1;
             }
             return 0;
