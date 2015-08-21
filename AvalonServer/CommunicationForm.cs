@@ -231,7 +231,7 @@ namespace AvalonServer
                     string data="";
   
                     threadPoolManage.currentUserInfo(ref index, ref nick);
-
+                    
                     data += formNumber + opcode + (index.Length*2) + argumentList[0];
                     for (int i = 0; i < index.Length;i++ )
                     {
@@ -240,7 +240,7 @@ namespace AvalonServer
 
                     threadPoolManage.sendToUser(connectionThread.userNick, data);
                     break;
-                //방 생성
+                    //방 생성
                 case 4:
                     try{
                         roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], argumentList[3], int.Parse(argumentList[4]));
@@ -342,6 +342,7 @@ namespace AvalonServer
                     connectionThread.sendMessage("" + formNumber + "01" + "00");
                     break;
                 case 2:
+                    connectionThread.sendMessage("" + formNumber + "02" + "00");
                     break;
                 case 3:
                     break;
