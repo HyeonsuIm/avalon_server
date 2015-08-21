@@ -15,11 +15,10 @@ namespace AvalonServer
         // 클라이언트 접속 IP
         IPEndPoint clientIpep;
 
-        public UserInfo userInfo
-        {
-            get;
-            set;
-        }
+        //유저 정보
+        public string userId;
+        public string userNick;
+        public int userIndex;
 
         // 데이터 송수신용
         byte[] data;
@@ -38,7 +37,6 @@ namespace AvalonServer
         {
             this.client = client;
             threadPoolManage = threadPool;
-            userInfo = new UserInfo();
         }
         
         /// <summary>
@@ -97,7 +95,7 @@ namespace AvalonServer
                     // 예외처리
                     if (comm.formNumber == 0 && comm.opcode == 10)
                     {
-                       userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
+                       userNick = ((LoginForm)comm).getInfo(out userIndex, out userId);
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {
