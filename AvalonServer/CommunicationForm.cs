@@ -329,6 +329,7 @@ namespace AvalonServer
                     connectionThread.sendMessage("" + formNumber + "01" + "00");
                     break;
                 case 2:
+                    connectionThread.sendMessage("" + formNumber + "02" + "00");
                     break;
                 case 3:
                     break;

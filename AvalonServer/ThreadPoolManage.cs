@@ -69,7 +69,7 @@ namespace AvalonServer
         public void sendToUser(string user, string data)
         {
             for(int i=0;i<clientList.Count;i++){
-                if (user == clientList.ElementAt(i).userNick)
+                if (user.Equals(clientList.ElementAt(i).userNick))
                 {
                     clientList.ElementAt(i).sendMessage(data);
                 }
