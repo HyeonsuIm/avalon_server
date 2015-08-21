@@ -158,7 +158,6 @@ namespace AvalonServer
         {
             int total = 0;
             int size = data.Length;
-
             int dataleft = size;
             int sent;
 
