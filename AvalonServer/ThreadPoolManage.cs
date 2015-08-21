@@ -33,7 +33,7 @@ namespace AvalonServer
             serverSocket.Bind(ipep);
             serverSocket.Listen(10);
 
-            
+            new List<int>().Add(30);
             
             clientList = new List<ConnectionThread>();
             //client = new TcpListener(IPAddress.Any, 9050);
@@ -72,6 +72,18 @@ namespace AvalonServer
                 if (user.Equals(clientList.ElementAt(i).userNick))
                 {
                     clientList.ElementAt(i).sendMessage(data);
+                }
+            }
+        }
+
+        public void sendToUser(int[] memberList, string data)
+        {
+            for (int i = 0; i < clientList.Count; i++)
+            {
+                for (int j = 0; j < memberList.Length; j++)
+                {
+                    if (memberList[j] == clientList.ElementAt(i).userIndex)
+                        clientList.ElementAt(i).sendMessage(data);
                 }
             }
         }

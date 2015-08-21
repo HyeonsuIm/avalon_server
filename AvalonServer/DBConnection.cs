@@ -20,6 +20,9 @@ namespace AvalonServer
         string PW = "AvalonPw";
         string database = "avalon";
 
+        /// <summary>
+        /// 서버 DB 접속
+        /// </summary>
         public void connect()
         {
             try {
@@ -34,16 +37,27 @@ namespace AvalonServer
             }
         }
 
+        /// <summary>
+        /// 서버 DB 접속종료
+        /// </summary>
         void disConnect()
         {
             conn.Close();
         }
 
+        /// <summary>
+        /// 쿼리문 설정
+        /// </summary>
+        /// <param name="str">쿼리</param>
         public void setQuery(string str)
         {
             query = str;
         }
 
+        /// <summary>
+        /// 설정된 쿼리문 수행
+        /// </summary>
+        /// <returns>쿼리실행 결과</returns>
         public string executeNonQuery()
         {
 
@@ -65,6 +79,13 @@ namespace AvalonServer
             }
             return result;
         }
+
+        /// <summary>
+        /// 새로운 유저 추가
+        /// </summary>
+        /// <param name="argumentList">유저 정보</param>
+        /// <param name="argumentCount">매개변수 개수</param>
+        /// <returns></returns>
         public int insertUser(string[] argumentList, int argumentCount)
         {
             try {
@@ -93,6 +114,10 @@ namespace AvalonServer
             return 0;
         }
 
+        /// <summary>
+        /// 새 유저 추가에 따른 승패 초기화
+        /// </summary>
+        /// <param name="userIndex">유저 index</param>
         public void insertUser(int userIndex)
         {
             query = "insert into winlate(U_index) values(" + userIndex + ")";
@@ -101,6 +126,14 @@ namespace AvalonServer
             cmd.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// 로그인을 위한 유저 정보 검색
+        /// </summary>
+        /// <param name="id">유저 id</param>
+        /// <param name="pwd">유저 pwd</param>
+        /// <param name="result">쿼리 수행 결과</param>
+        /// <param name="nick">유저 닉네임</param>
+        /// <param name="userId">유저 id</param>
         public void selectUser(string id, string pwd, out string result, out string nick, out string userId)
         {
             query = "select U_Index,U_Nick,U_Id from user where U_Id='"+id+"' and U_Pw='" + pwd+"'";
@@ -122,6 +155,12 @@ namespace AvalonServer
                 userId = "";
             }
         }
+
+        /// <summary>
+        /// 이메일을 통한 유저 아이디 찾기
+        /// </summary>
+        /// <param name="email">유저 이메일</param>
+        /// <returns></returns>
         public string selectUser(string email) {
             string result;
             query = "select U_Id from user where U_Mail='" + email + "'";
@@ -143,6 +182,14 @@ namespace AvalonServer
 
         }
 
+        /// <summary>
+        /// 유저 승패 정보
+        /// </summary>
+        /// <param name="index">유저 index</param>
+        /// <param name="win">승</param>
+        /// <param name="lose">패</param>
+        /// <param name="draw">무</param>
+        /// <returns></returns>
         public int getWinLose(int index, out int win, out int lose, out int draw)
         {
             query = "select W_win,W_lose,W_draw from winlate where U_index=" + index + "";
@@ -167,6 +214,12 @@ namespace AvalonServer
             return 0;
         }
 
+        /// <summary>
+        /// index를 통해 유저 닉네임 찾기
+        /// </summary>
+        /// <param name="receiveIndex">유저 index</param>
+        /// <param name="nick">유저 닉네임</param>
+        /// <returns></returns>
         public int getUserNick(int receiveIndex, out string nick)
         {
             query = "select U_Nick from user where U_index=" + receiveIndex + "";
@@ -187,6 +240,11 @@ namespace AvalonServer
             }
         }
 
+        /// <summary>
+        /// 유저 비밀번호 변경
+        /// </summary>
+        /// <param name="id">유저 id</param>
+        /// <param name="password">유저 비밀번호</param>
         public void updateUser(string id, string password)
         {
             try

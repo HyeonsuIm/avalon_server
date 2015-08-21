@@ -208,15 +208,14 @@ namespace AvalonServer
                     threadPoolManage.sendToUser(argumentList[1], formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
                     connectionThread.sendMessage(formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
                     break;
-                //방정보 요청
+                // 방정보 요청
+                // 직렬화
                 case 2:
                     BinaryFormatter bf = new BinaryFormatter();
                     MemoryStream ms = new MemoryStream();
                     bf.Serialize(ms, threadPoolManage.roomListInfo); 
 
                     ms.Position = 0;
-
-                    RoomListInfo rm = (RoomListInfo)bf.Deserialize(ms);
 
                     int msSize = ms.ToArray().Length;
                     byte[] buffer = new byte[msSize+5];
@@ -230,7 +229,7 @@ namespace AvalonServer
                     //방 생성
                 case 4:
                     try{
-                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], argumentList[3], int.Parse(argumentList[4]));
+                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], connectionThread.userIndex, argumentList[3], int.Parse(argumentList[4]));
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
@@ -242,7 +241,7 @@ namespace AvalonServer
                 case 5:
                     try
                     {
-                        roomListInfo.comeInRoom(argumentList[0], Int16.Parse(argumentList[1]), argumentList[2]);
+                        roomListInfo.comeInRoom(connectionThread.userIndex, argumentList[0], Int16.Parse(argumentList[1]), argumentList[2]);
                         connectionThread.sendMessage("" + formNumber + "05" + "01" + "1");
                     }
                     catch (Exception e)
@@ -251,6 +250,42 @@ namespace AvalonServer
                         connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
                     }
                     break;
+            }
+        }
+    }
+    
+    class RoomForm : CommunicationForm
+    {
+        public RoomForm()
+        {
+            formNumber = 2;
+        }
+
+        public override void process()
+        {
+            switch (opcode)
+            {
+                case 1:
+                    RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
+                    int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
+
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(number), "" + formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
+                        break;
+                case 2:
+                    break;
+                case 10:
+                    break;
+                case 11:
+                    break;
+                case 12:
+                    break;
+                case 13:
+                    break;
+                case 14:
+                    break;
+                case 15:
+                    break;
+
             }
         }
     }
@@ -264,7 +299,19 @@ namespace AvalonServer
 
         public override void process()
         {
-            //내용을 추가하자
+            switch (opcode)
+            {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+            }
         }
     }
 
