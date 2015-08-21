@@ -10,19 +10,19 @@ namespace AvalonServer
     public class RoomListInfo
     {
         // 방 개수 증가폭
-        const int IDwidth = 20;
+        public const int IDwidth = 20;
 
         // 방 최대 개수
-        int roomMaxSize;
+        public int roomMaxSize;
 
         // 현재 방 개수
-        int roomCount;
+        public int roomCount;
 
         // 방 정보
         public RoomInfo[] roomInfo;
 
         // 번호 사용 여부
-        bool[] roomNumberUsed;
+        public bool[] roomNumberUsed;
         
         public RoomListInfo()
         {
@@ -68,9 +68,10 @@ namespace AvalonServer
             roomCount++;
         }
 
-        public void comeInRoom(int memberIndex, string userId, int roomNumber, string password)
+        public int comeInRoom(int memberIndex, string userId, int roomNumber, string password)
         {
             roomInfo[roomNumber].addUser(memberIndex, userId, password);
+            return roomNumber;
         }
 
         public void comeOutRoom(int roomNumber, int memberIndex)
@@ -126,12 +127,17 @@ namespace AvalonServer
         {
             if (this.password.Equals(password))
             {
-                memberIndexList[memberCount] = memberIndex;
-                memberList[memberCount++] = userId;
+                if (memberCount < maxPerson)
+                {
+                    memberIndexList[memberCount] = memberIndex;
+                    memberList[memberCount++] = userId;
+                }
+                else
+                    throw new Exception("인원 수 초과");
             }
             else
             {
-                throw new Exception("room full");
+                throw new Exception("비밀번호 에러");
             }
         }
 
@@ -155,6 +161,7 @@ namespace AvalonServer
             num = number;
             this.maxPerson = maxPerson;
             memberList = new string[maxPerson];
+            memberIndexList = new int[maxPerson];
             this.name = name;
             this.type = type;
             this.password = password;
@@ -177,6 +184,13 @@ namespace AvalonServer
                 roomInfo[i + 6] = memberList[i];
             }
             return roomInfo;
+        }
+
+        public void setRoom(int type, string name, string password)
+        {
+            this.type = type;
+            this.name = name;
+            this.password = password;
         }
     }
 }

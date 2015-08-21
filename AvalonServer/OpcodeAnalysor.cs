@@ -38,7 +38,7 @@ namespace AvalonServer
                     form = new LobbyForm();
                     break;
                 case FormNumber.Game:
-                    form = new GameForm();
+                    form = new RoomForm();
                     break;
                 case FormNumber.Shutdown:
                     form = new ShutdownForm();

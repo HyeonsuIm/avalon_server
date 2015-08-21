@@ -245,7 +245,7 @@ namespace AvalonServer
                     //방 생성
                 case 4:
                     try{
-                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], userInfo.userIndex, argumentList[3], int.Parse(argumentList[4]));
+                        roomListInfo.addRoom(int.Parse(argumentList[0]), argumentList[1], argumentList[2], userInfo.userIndex, argumentList[3], int.Parse(argumentList[4]));
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
@@ -257,13 +257,13 @@ namespace AvalonServer
                 case 5:
                     try
                     {
-                        roomListInfo.comeInRoom(userInfo.userIndex, argumentList[0], int.Parse(argumentList[1]), argumentList[2]);
-                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "1");
+                        int roomNumber = roomListInfo.comeInRoom(userInfo.userIndex, argumentList[0], int.Parse(argumentList[1]), argumentList[2]);
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + roomNumber);
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "-1");
                     }
                     break;
             }
@@ -281,28 +281,46 @@ namespace AvalonServer
 
         public override void process()
         {
+             roomProcess = new RoomListProcess(roomListInfo);
             userInfo = connectionThread.userInfo;
             switch (opcode)
             {
-                case 1:
-                    roomProcess = new RoomListProcess(roomListInfo);
-                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
+                case 0:
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
                         break;
                 case 2:
 
                     break;
                 case 10:
-
                     break;
                 case 11:
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userNick);
+                    roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
+                    userInfo.Number = -1;
+                    userInfo.State = (int)UserInfo.state.LOBBY;
                     break;
                 case 12:
+
                     break;
-                case 13:
+                case 13: 
+                    try
+                    {
+                        roomProcess.setRoom(int.Parse(argumentList[0]), argumentList[1], argumentList[2], roomProcess.findRoomNumber(userInfo.Number));
+
+                        connectionThread.sendMessage("" + formNumber + "13" + "01" + "1");
+                    }
+                    catch (Exception)
+                    {
+                        connectionThread.sendMessage("" + formNumber + "13" + "01" + "0");
+                    }
                     break;
                 case 14:
+                    
+                    roomProcess.removeRoom(userInfo.Number);
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "14" + "01" + userInfo.userIndex);
                     break;
                 case 15:
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "15" + "00");
                     break;
 
             }

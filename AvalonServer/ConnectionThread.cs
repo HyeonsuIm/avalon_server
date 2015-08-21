@@ -78,7 +78,8 @@ namespace AvalonServer
                 try {
                     // 데이터 수신 대기 및 수신
                     data = receiveVarData();
-
+                    if (data == null)
+                        break;
                     Console.WriteLine("\n********************message receive*********************");
 
                     // 수신 된 데이터를 분석하기 위한 객체 생성
@@ -122,7 +123,6 @@ namespace AvalonServer
                 }
                 Console.WriteLine("********************message process complete*********************\n");
             }
-            Console.WriteLine("********************message process complete*********************\n");
 
             // 연결 종료
             disConnect();
@@ -185,6 +185,8 @@ namespace AvalonServer
             int recv;
             byte[] datasize = new byte[4];
             recv = client.Receive(datasize,0,4,0);
+            if (recv == 0)
+                return null;
             int size = BitConverter.ToInt32(datasize,0);
             int dataleft = size;
             byte[] data = new byte[size];

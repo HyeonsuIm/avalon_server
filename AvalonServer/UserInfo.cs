@@ -13,7 +13,7 @@ namespace AvalonServer
         public string userNick;
         public int userIndex;
 
-        enum state { LOBBY = 0, ROOM, GAME };
+        public enum state { LOBBY = 0, ROOM, GAME };
         //유저 상태
         public int State{
             get;
