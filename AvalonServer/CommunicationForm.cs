@@ -190,7 +190,6 @@ namespace AvalonServer
     /// </summary>
     class LobbyForm : CommunicationForm
     {
-        UserInfo userInfo;
         public LobbyForm()
         {
             formNumber = 1;
@@ -198,7 +197,6 @@ namespace AvalonServer
         
         override public void process()
         {
-            userInfo = connectionThread.userInfo;
             switch (opcode)
             {
                 // 채팅
@@ -229,23 +227,22 @@ namespace AvalonServer
                 case 3:
                     int[] index = null;
                     string[] nick = null;
-                    string data; 
+                    string data="";
+  
                     threadPoolManage.currentUserInfo(ref index, ref nick);
-
-                    data = "" + (formNumber * 10000 + opcode * 100 + index.Length * 2);
                     
-                    data +=index[0] + delimiter + nick[0];
-                    for (int i = 1; i < index.Length;i++ )
+                    data += formNumber + opcode + (index.Length*2) + argumentList[0];
+                    for (int i = 0; i < index.Length;i++ )
                     {
                         data += delimiter + index[i] + delimiter + nick[i]; 
                     }
 
-                    connectionThread.sendMessage(data);
+                    threadPoolManage.sendToUser(connectionThread.userNick, data);
                     break;
                     //방 생성
                 case 4:
                     try{
-                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], userInfo.userIndex, argumentList[3], int.Parse(argumentList[4]));
+                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], connectionThread.userIndex, argumentList[3], int.Parse(argumentList[4]));
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
@@ -257,7 +254,7 @@ namespace AvalonServer
                 case 5:
                     try
                     {
-                        roomListInfo.comeInRoom(userInfo.userIndex, argumentList[0], int.Parse(argumentList[1]), argumentList[2]);
+                        roomListInfo.comeInRoom(connectionThread.userIndex, argumentList[0], Int16.Parse(argumentList[1]), argumentList[2]);
                         connectionThread.sendMessage("" + formNumber + "05" + "01" + "1");
                     }
                     catch (Exception e)
@@ -272,8 +269,6 @@ namespace AvalonServer
     
     class RoomForm : CommunicationForm
     {
-        UserInfo userInfo;
-        RoomListProcess roomProcess;
         public RoomForm()
         {
             formNumber = 2;
@@ -281,18 +276,17 @@ namespace AvalonServer
 
         public override void process()
         {
-            userInfo = connectionThread.userInfo;
             switch (opcode)
             {
                 case 1:
-                    roomProcess = new RoomListProcess(roomListInfo);
-                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
+                    RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
+                    int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
+
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(number), "" + formNumber + "01" + "02" + argumentList[0] + delimiter + argumentList[2]);
                         break;
                 case 2:
-
                     break;
                 case 10:
-
                     break;
                 case 11:
                     break;
