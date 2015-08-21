@@ -69,7 +69,7 @@ namespace AvalonServer
         public void sendToUser(string user, string data)
         {
             for(int i=0;i<clientList.Count;i++){
-                if (user.Equals(clientList.ElementAt(i).userNick))
+                if (user.Equals(clientList.ElementAt(i).userInfo.userNick))
                 {
                     clientList.ElementAt(i).sendMessage(data);
                 }
@@ -86,8 +86,8 @@ namespace AvalonServer
             nick = new string[clientList.Count];
             for(int i=0;i<clientList.Count;i++)
             {
-                index[i] = clientList.ElementAt(i).userIndex;
-                nick[i] = clientList.ElementAt(i).userNick;
+                index[i] = clientList.ElementAt(i).userInfo.userIndex;
+                nick[i] = clientList.ElementAt(i).userInfo.userNick;
             }
         }
 
@@ -97,7 +97,7 @@ namespace AvalonServer
             {
                 for (int j = 0; j < memberList.Length; j++)
                 {
-                    if (memberList[j] == clientList.ElementAt(i).userIndex)
+                    if (memberList[j] == clientList.ElementAt(i).userInfo.userIndex)
                         clientList.ElementAt(i).sendMessage(data);
                 }
             }

@@ -16,9 +16,11 @@ namespace AvalonServer
         IPEndPoint clientIpep;
 
         //유저 정보
-        public string userId;
-        public string userNick;
-        public int userIndex;
+        public UserInfo userInfo
+        {
+            get;
+            set;
+        }
 
         // 데이터 송수신용
         byte[] data;
@@ -95,7 +97,7 @@ namespace AvalonServer
                     // 예외처리
                     if (comm.formNumber == 0 && comm.opcode == 10)
                     {
-                       userNick = ((LoginForm)comm).getInfo(out userIndex, out userId);
+                       userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {

@@ -190,6 +190,7 @@ namespace AvalonServer
     /// </summary>
     class LobbyForm : CommunicationForm
     {
+        UserInfo userInfo;
         public LobbyForm()
         {
             formNumber = 1;
@@ -228,7 +229,7 @@ namespace AvalonServer
                     int[] index = null;
                     string[] nick = null;
                     string data="";
-  
+                    userInfo = connectionThread.userInfo;
                     threadPoolManage.currentUserInfo(ref index, ref nick);
 
                     data += formNumber + opcode + (index.Length*2) + argumentList[0];
@@ -237,11 +238,12 @@ namespace AvalonServer
                         data += delimiter + index[i] + delimiter + nick[i]; 
                     }
 
-                    threadPoolManage.sendToUser(connectionThread.userNick, data);
+                    threadPoolManage.sendToUser(userInfo.userNick, data);
                     break;
                     //방 생성
                 case 4:
                     try{
+                        userInfo = connectionThread.userInfo;
                         roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], userInfo.userIndex, argumentList[3], int.Parse(argumentList[4]));
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
@@ -254,6 +256,7 @@ namespace AvalonServer
                 case 5:
                     try
                     {
+                        userInfo = connectionThread.userInfo;
                         int roomNumber = roomListInfo.comeInRoom(userInfo.userIndex, argumentList[0], int.Parse(argumentList[1]), argumentList[2]);
                         connectionThread.sendMessage("" + formNumber + "05" + "01" + roomNumber);
                     }
@@ -278,7 +281,7 @@ namespace AvalonServer
 
         public override void process()
         {
-             roomProcess = new RoomListProcess(roomListInfo);
+            roomProcess = new RoomListProcess(roomListInfo);
             userInfo = connectionThread.userInfo;
             switch (opcode)
             {
