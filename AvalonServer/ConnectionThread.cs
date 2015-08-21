@@ -134,7 +134,7 @@ namespace AvalonServer
         {
             Console.WriteLine("<send Message>");
             Console.WriteLine("{0}\n", data);
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            byte[] byteData = Encoding.UTF8.GetBytes(data);
             sendVarData(byteData);
         }
 
@@ -158,7 +158,6 @@ namespace AvalonServer
         {
             int total = 0;
             int size = data.Length;
-
             int dataleft = size;
             int sent;
 

@@ -224,10 +224,23 @@ namespace AvalonServer
                     ms.ToArray().CopyTo(buffer,5);
                     connectionThread.sendMessage(buffer);
                     break;
+                //플레이어 전체 정보 요청
                 case 3:
-                    
+                    int[] index = null;
+                    string[] nick = null;
+                    string data="";
+  
+                    threadPoolManage.currentUserInfo(ref index, ref nick);
+
+                    data += formNumber + opcode + (index.Length*2) + argumentList[0];
+                    for (int i = 0; i < index.Length;i++ )
+                    {
+                        data += delimiter + index[i] + delimiter + nick[i]; 
+                    }
+
+                    threadPoolManage.sendToUser(connectionThread.userNick, data);
                     break;
-                    //방 생성
+                //방 생성
                 case 4:
                     try{
                         roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], argumentList[3], int.Parse(argumentList[4]));

@@ -75,6 +75,21 @@ namespace AvalonServer
                 }
             }
         }
+        /// <summary>
+        /// 현재 접속중인 사용자 모두의 간략한 정보를 보냄
+        /// </summary>
+        /// <param name="data">전송할 데이터</param>
+
+        public void currentUserInfo(ref int[] index, ref string[] nick)
+        {
+            index = new int[clientList.Count];
+            nick = new string[clientList.Count];
+            for(int i=0;i<clientList.Count;i++)
+            {
+                index[i] = clientList.ElementAt(i).userIndex;
+                nick[i] = clientList.ElementAt(i).userNick;
+            }
+        }
 
         /// <summary>
         /// 리스트에 TcpClient객체 추가
