@@ -97,6 +97,16 @@ namespace AvalonServer
             
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
+
+                query ="select U_index from user where U_id = '"+ argumentList[0]+ "'" ;
+                da = new MySqlDataAdapter(query, conn);
+                ds = new DataSet();
+                da.Fill(ds);
+                DataRow dr = ds.Tables[0].Rows[0];
+                query = "insert into winlate(U_index) values('" + dr["U_index"].ToString()+"')";
+                cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+                
             }
             catch (IndexOutOfRangeException)
             {
