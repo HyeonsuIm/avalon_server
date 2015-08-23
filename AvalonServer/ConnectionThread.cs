@@ -13,7 +13,7 @@ namespace AvalonServer
         // 클라이언트 접속 유지를 위한 객체
         Socket client;
         // 클라이언트 접속 IP
-        IPEndPoint clientIpep;
+        public IPEndPoint clientIpep;
 
         //유저 정보
         public UserInfo userInfo

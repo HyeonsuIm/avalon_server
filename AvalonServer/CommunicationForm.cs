@@ -319,7 +319,7 @@ namespace AvalonServer
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "14" + "01" + userInfo.userIndex);
                     break;
                 case 15:
-                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "15" + "00");
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "15" + "01" + connectionThread.clientIpep.Address);
                     break;
 
             }
