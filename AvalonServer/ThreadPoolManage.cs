@@ -66,15 +66,8 @@ namespace AvalonServer
             }
         }
 
-        public void sendToUser(string user, string data)
-        {
-            for(int i=0;i<clientList.Count;i++){
-                if (user.Equals(clientList.ElementAt(i).userInfo.userNick))
-                {
-                    clientList.ElementAt(i).sendMessage(data);
-                }
-            }
-        }
+
+        
         /// <summary>
         /// 현재 접속중인 사용자 모두의 간략한 정보를 보냄
         /// </summary>
@@ -91,6 +84,16 @@ namespace AvalonServer
             }
         }
 
+        public void sendToUser(int memberIndex, string data)
+        {
+            for(int i = 0; i < clientList.Count; i++)
+            {
+                if(memberIndex == clientList.ElementAt(i).userInfo.userIndex)
+                {
+                    clientList.ElementAt(i).sendMessage(data);
+                }
+            }
+        }
         public void sendToUser(int[] memberList, string data)
         {
             for (int i = 0; i < clientList.Count; i++)
@@ -101,6 +104,21 @@ namespace AvalonServer
                         clientList.ElementAt(i).sendMessage(data);
                 }
             }
+        }
+
+        public int findIndexToId(string id)
+        {
+            int index = -1;
+            for(int i = 0; i < clientList.Count; i++)
+            {
+                if (id.Equals(clientList.ElementAt(i).userInfo.userId))
+                {
+                    index = clientList.ElementAt(i).userInfo.userIndex;
+                    break;
+                }
+
+            }
+            return index;
         }
 
         /// <summary>
