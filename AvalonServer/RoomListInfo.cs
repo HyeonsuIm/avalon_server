@@ -106,7 +106,7 @@ namespace AvalonServer
         int num;
         string password;
         int memberCount;
-        string[] memberList;
+        string[] memberNickList;
         int[] memberIndexList;
 
         public int getMemberCount()
@@ -130,7 +130,7 @@ namespace AvalonServer
                 if (memberCount < maxPerson)
                 {
                     memberIndexList[memberCount] = memberIndex;
-                    memberList[memberCount++] = userId;
+                    memberNickList[memberCount++] = userId;
                 }
                 else
                     throw new Exception("인원 수 초과");
@@ -152,7 +152,7 @@ namespace AvalonServer
             for (; i < memberCount; i++)
             {
                 memberIndexList[i] = memberIndexList[i + 1];
-                memberList[i] = memberList[i + 1];
+                memberNickList[i] = memberNickList[i + 1];
             }
         }
 
@@ -160,14 +160,14 @@ namespace AvalonServer
         {
             num = number;
             this.maxPerson = maxPerson;
-            memberList = new string[maxPerson];
+            memberNickList = new string[maxPerson];
             memberIndexList = new int[maxPerson];
             this.name = name;
             this.type = type;
             this.password = password;
             memberCount = 1;
             memberIndexList[0] = memberIndex;
-            memberList[0] = memberId;
+            memberNickList[0] = memberId;
         }
 
         public string[] getRoomInfo()
@@ -179,9 +179,9 @@ namespace AvalonServer
             roomInfo[3] = memberCount.ToString();
             roomInfo[4] = maxPerson.ToString();
             roomInfo[5] = num.ToString();
-            for (int i = 0; i < memberList.Length; i++)
+            for (int i = 0; i < memberNickList.Length; i++)
             {
-                roomInfo[i + 6] = memberList[i];
+                roomInfo[i + 6] = memberNickList[i];
             }
             return roomInfo;
         }

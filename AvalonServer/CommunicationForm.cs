@@ -261,8 +261,10 @@ namespace AvalonServer
                 case 5:
                     try
                     {
+                        userInfo = connectionThread.userInfo;
                         RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
                         int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
+                        roomListInfo.comeInRoom(userInfo.userIndex, userInfo.userId, number, argumentList[2]);
                         bf = new BinaryFormatter();
                         ms = new MemoryStream();
                         bf.Serialize(ms, threadPoolManage.roomListInfo.roomInfo[number]);

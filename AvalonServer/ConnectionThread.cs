@@ -53,7 +53,7 @@ namespace AvalonServer
             clientIpep = (IPEndPoint)client.RemoteEndPoint;
             Console.WriteLine("New Client connect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
             
-            sendMessage("connection sucess");
+            sendMessage("9" + "00" + "00");
         }
         
         /// <summary>
@@ -103,7 +103,7 @@ namespace AvalonServer
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {
                         break;
-                    }
+                    } 
 
                     // 수신된 데이터 출력
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
