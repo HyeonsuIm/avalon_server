@@ -37,6 +37,7 @@ namespace AvalonServer
         /// <param name="threadPool">클라이언트 연결을 관리할 쓰레드 풀</param>
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
+            userInfo = new UserInfo();
             this.client = client;
             threadPoolManage = threadPool;
         }

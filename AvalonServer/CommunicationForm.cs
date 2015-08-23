@@ -236,8 +236,9 @@ namespace AvalonServer
                     userInfo = connectionThread.userInfo;
                     threadPoolManage.currentUserInfo(ref index, ref nick);
 
-                    data += formNumber + opcode + (index.Length*2) + argumentList[0];
-                    for (int i = 0; i < index.Length;i++ )
+                    data += (formNumber*10000 + opcode*100 + (index.Length * 2));
+                    data += index[0] + delimiter + nick[0];
+                    for (int i = 1; i < index.Length;i++ )
                     {
                         data += delimiter + index[i] + delimiter + nick[i]; 
                     }
