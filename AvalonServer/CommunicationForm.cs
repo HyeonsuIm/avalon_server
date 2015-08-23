@@ -198,6 +198,10 @@ namespace AvalonServer
         
         override public void process()
         {
+            BinaryFormatter bf;
+            MemoryStream ms;
+            int msSize;
+            byte[] buffer;
             switch (opcode)
             {
                 // 채팅
@@ -212,14 +216,14 @@ namespace AvalonServer
                 // 방정보 요청
                 // 직렬화
                 case 2:
-                    BinaryFormatter bf = new BinaryFormatter();
-                    MemoryStream ms = new MemoryStream();
+                    bf = new BinaryFormatter();
+                    ms = new MemoryStream();
                     bf.Serialize(ms, threadPoolManage.roomListInfo); 
 
                     ms.Position = 0;
 
-                    int msSize = ms.ToArray().Length;
-                    byte[] buffer = new byte[msSize+5];
+                    msSize = ms.ToArray().Length;
+                    buffer = new byte[msSize+5];
                     Encoding.UTF8.GetBytes("10202").CopyTo(buffer, 0);
                     ms.ToArray().CopyTo(buffer,5);
                     connectionThread.sendMessage(buffer);
@@ -256,9 +260,19 @@ namespace AvalonServer
                 case 5:
                     try
                     {
-                        userInfo = connectionThread.userInfo;
-                        int roomNumber = roomListInfo.comeInRoom(userInfo.userIndex, argumentList[0], int.Parse(argumentList[1]), argumentList[2]);
-                        connectionThread.sendMessage("" + formNumber + "05" + "01" + roomNumber);
+                        RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
+                        int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
+                        bf = new BinaryFormatter();
+                        ms = new MemoryStream();
+                        bf.Serialize(ms, threadPoolManage.roomListInfo.roomInfo[number]);
+
+                        ms.Position = 0;
+
+                        msSize = ms.ToArray().Length;
+                        buffer = new byte[msSize + 5];
+                        Encoding.UTF8.GetBytes(""+formNumber+"05"+"01").CopyTo(buffer, 0);
+                        ms.ToArray().CopyTo(buffer, 5);
+                        connectionThread.sendMessage(buffer);
                     }
                     catch (Exception e)
                     {

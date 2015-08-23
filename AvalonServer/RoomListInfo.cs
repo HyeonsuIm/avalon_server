@@ -23,7 +23,7 @@ namespace AvalonServer
 
         // 번호 사용 여부
         public bool[] roomNumberUsed;
-        
+
         public RoomListInfo()
         {
             roomCount = 0;
