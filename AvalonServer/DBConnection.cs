@@ -225,6 +225,90 @@ namespace AvalonServer
         }
 
         /// <summary>
+        /// 유저 승패 갱신
+        /// </summary>
+        /// <param name="index">유저 index</param>
+        /// <param name="win">승</param>
+        /// <param name="lose">패</param>
+        /// <param name="draw">무</param>
+        /// <returns></returns>
+
+        public int setWinLose(string[] argumentlist)
+        {
+            try
+            {
+                int result = 0;
+
+                string winIndex = "";
+                string loseIndex = "";
+                string drawIndex = "";
+                string sql = "";
+
+                bool winCheck = false;
+                bool loseCheck = false;
+                bool drawCheck = false;
+                for (int i = 0; i < argumentlist.Length; i += 2)
+                {
+
+                    switch (Int32.Parse(argumentlist[i + 1]))
+                    {
+                        case 0:
+                            if (drawCheck)
+                                drawIndex += ",";
+                            drawIndex += argumentlist[i];
+                            break;
+                        case 1:
+                            if (winCheck)
+                                winIndex += ",";
+                            winIndex += argumentlist[i];
+                            break;
+                        case 2:
+                            if (loseCheck)
+                                loseIndex += ",";
+                            loseIndex += argumentlist[i];
+                            break;
+                    }
+                }
+                if (!drawCheck)
+                    drawIndex = "''";
+                if (!winCheck)
+                    winIndex = "''";
+                if (!loseCheck)
+                    loseIndex = "''";
+
+                sql = getSql(winIndex, loseIndex, drawIndex);
+
+                MySqlCommand comm = new MySqlCommand(sql, conn);
+                comm.ExecuteNonQuery();
+                return result;
+            }
+            catch(Exception)
+            {
+                return 99;
+            }
+
+        }
+
+
+        private string getSql(string win, string lose, string draw)
+        {
+            return "update winlate " +
+                            "set W_win = case " +
+                                    "when u_index in  (" + win + ") then w_win + 1" +
+                                    "else W_win" +
+                                    "end," +
+                            "W_lose = case" +
+                                    "when u_index in (" + lose + ") then w_lose + 1" +
+                                    "else W_lose" +
+                                "end," +
+                            "W_draw = case" +
+                                "when  u_index in (" + draw + ") then w_draw + 1" +
+                                "else w_draw" +
+                                "end" +
+                         "where U_index in ("+win+","+lose+","+draw+")";
+        }
+
+        /// <summary>
         /// index를 통해 유저 닉네임 찾기
         /// </summary>
         /// <param name="receiveIndex">유저 index</param>

@@ -371,6 +371,11 @@ namespace AvalonServer
                     break;
                 case 5:
                     break;
+                case 99:
+                    DBConnection localDB = ServerMain.DBC;
+                    int result;
+                    result = localDB.setWinLose(argumentList);
+                    break;
             }
         }
     }
