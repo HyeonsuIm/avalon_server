@@ -245,7 +245,7 @@ namespace AvalonServer
                 case 4:
                     try{
                         userInfo = connectionThread.userInfo;
-                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2], int.Parse(argumentList[4]), userInfo);
+                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2],int.Parse(argumentList[4]), userInfo);
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
@@ -343,11 +343,9 @@ namespace AvalonServer
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "14" + "01" + userInfo.userIndex);
                     break;
                 case 15:
-                    //0번 방장, 나머지 유저
-                    //0번은 호스트가 되어야하고, 나머지는 호스트에 연결을 한다.
-                    //argumentList[0] = 호스트 index
-                    //argumentLIst[1] = 방번호
-
+                    //방장에게는 호스트 및 나머지 유저들의 ip정보를 받고,
+                    //나머지에게는 방장의 ip정보를 준다.
+                    
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "15" + "01" + connectionThread.clientIpep.Address);
                     break;
 
@@ -380,7 +378,6 @@ namespace AvalonServer
                     DBConnection localDB = ServerMain.DBC;
                     int result;
                     result = localDB.setWinLose(argumentList);
-                    // 반응 보내기
                     break;
             }
         }

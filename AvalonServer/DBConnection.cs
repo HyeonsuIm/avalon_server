@@ -15,7 +15,7 @@ namespace AvalonServer
         MySqlDataAdapter da;
         DataSet ds;
         string query;
-        string IP = "203.255.3.72";
+        string IP = "203.255.3.112";
         string ID = "avalon";
         string PW = "AvalonPw";
         string database = "avalon";
