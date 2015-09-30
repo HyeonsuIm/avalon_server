@@ -99,6 +99,7 @@ namespace AvalonServer
                     if (comm.formNumber == 0 && comm.opcode == 10)
                     {
                        userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
+                       userInfo.IP = clientIpep.ToString();
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {

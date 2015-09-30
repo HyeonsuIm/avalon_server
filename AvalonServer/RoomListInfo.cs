@@ -46,7 +46,7 @@ namespace AvalonServer
         /// <param name="type">방 타입</param>
         /// <param name="password">방 비밀번호</param>
         /// <param name="member">방장 이름</param>
-        public void addRoom(int type, string name, string password, int memberIndex, string memberId, int maxPerson)
+        public void addRoom(int type, string name, string password, int maxPerson, UserInfo host)
         {
             int number;
             for (number = 0; number < roomMaxSize; number++)
@@ -64,13 +64,13 @@ namespace AvalonServer
                 Array.Resize<bool>(ref roomNumberUsed, roomMaxSize);
             }
             roomInfo[number] = new RoomInfo();
-            roomInfo[number].createRoom(name, type, password, memberIndex, memberId, maxPerson, number);
+            roomInfo[number].createRoom(name, type, password, maxPerson, number, host);
             roomCount++;
         }
 
-        public int comeInRoom(int memberIndex, string userId, int roomNumber, string password)
+        public int comeInRoom(int roomNumber, string password, UserInfo user)
         {
-            roomInfo[roomNumber].addUser(memberIndex, userId, password);
+            roomInfo[roomNumber].addUser(user, password);
             return roomNumber;
         }
 
@@ -106,8 +106,13 @@ namespace AvalonServer
         int num;
         string password;
         int memberCount;
-        string[] memberNickList;
-        int[] memberIndexList;
+        
+        //string[] memberNickList;
+        //int[] memberIndexList;
+        //int[] memberIPList;
+        
+        UserInfo[] memberInfo;
+
 
         public int getMemberCount()
         {
@@ -120,17 +125,22 @@ namespace AvalonServer
 
         public int[] getMemberIndexList()
         {
-            return memberIndexList;
+            int[] IndexList = new int[memberCount];
+            for (int i = 0; i < memberCount;i++)
+            {
+                IndexList[i] = memberInfo[i].userIndex;
+            }
+            return IndexList;
         }
-
-        public void addUser(int memberIndex, string userId, string password)
+        //매개변수 부분 고쳐야될듯
+        public void addUser(UserInfo addUser, string password)
         {
             if (this.password.Equals(password))
             {
                 if (memberCount < maxPerson)
                 {
-                    memberIndexList[memberCount] = memberIndex;
-                    memberNickList[memberCount++] = userId;
+                    memberInfo[memberCount] = addUser;
+                    
                 }
                 else
                     throw new Exception("인원 수 초과");
@@ -146,28 +156,30 @@ namespace AvalonServer
             int i;
             for (i = 0; i < memberCount; i++)
             {
-                if (memberIndexList[i] == memberIndex)
+                if (memberInfo[i].userIndex == memberIndex)
                     break;
             }
             for (; i < memberCount; i++)
             {
-                memberIndexList[i] = memberIndexList[i + 1];
-                memberNickList[i] = memberNickList[i + 1];
+                //앞으로 땡김
+                memberInfo[i] = memberInfo[i + 1];
             }
         }
 
-        public void createRoom(string name, int type, string password, int memberIndex, string memberId, int maxPerson, int number)
+        public void createRoom(string name, int type, string password, int maxPerson, int number, UserInfo host)
         {
             num = number;
             this.maxPerson = maxPerson;
-            memberNickList = new string[maxPerson];
-            memberIndexList = new int[maxPerson];
+            
+            //memberNickList = new string[maxPerson];
+            //memberIndexList = new int[maxPerson];
+            memberInfo = new UserInfo[maxPerson];
+
             this.name = name;
             this.type = type;
             this.password = password;
             memberCount = 1;
-            memberIndexList[0] = memberIndex;
-            memberNickList[0] = memberId;
+            memberInfo[0] = host;
         }
 
         public string[] getRoomInfo()
@@ -179,9 +191,9 @@ namespace AvalonServer
             roomInfo[3] = memberCount.ToString();
             roomInfo[4] = maxPerson.ToString();
             roomInfo[5] = num.ToString();
-            for (int i = 0; i < memberNickList.Length; i++)
+            for (int i = 0; i < memberInfo.Length; i++)
             {
-                roomInfo[i + 6] = memberNickList[i];
+                roomInfo[i + 6] = memberInfo[i].userNick;
             }
             return roomInfo;
         }
