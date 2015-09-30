@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AvalonServer
 {
-    public class UserInfo
+    [Serializable]
+    public class TcpUserInfo
     {
         //유저 정보
         public string userId;

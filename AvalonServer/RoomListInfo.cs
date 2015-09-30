@@ -46,7 +46,7 @@ namespace AvalonServer
         /// <param name="type">방 타입</param>
         /// <param name="password">방 비밀번호</param>
         /// <param name="member">방장 이름</param>
-        public void addRoom(int type, string name, string password, int maxPerson, UserInfo host)
+        public void addRoom(int type, string name, string password, int maxPerson, TcpUserInfo host)
         {
             int number;
             for (number = 0; number < roomMaxSize; number++)
@@ -68,7 +68,7 @@ namespace AvalonServer
             roomCount++;
         }
 
-        public int comeInRoom(int roomNumber, string password, UserInfo user)
+        public int comeInRoom(int roomNumber, string password, TcpUserInfo user)
         {
             roomInfo[roomNumber].addUser(user, password);
             return roomNumber;
@@ -95,6 +95,11 @@ namespace AvalonServer
         {
             return roomCount;
         }
+
+        public RoomInfo getRoomInfo(int roomNumber)
+        {
+            return roomInfo[roomNumber];
+        }
     }
 
     [Serializable]
@@ -111,7 +116,7 @@ namespace AvalonServer
         //int[] memberIndexList;
         //int[] memberIPList;
         
-        UserInfo[] memberInfo;
+        public TcpUserInfo[] memberInfo;
 
 
         public int getMemberCount()
@@ -133,7 +138,7 @@ namespace AvalonServer
             return IndexList;
         }
         //매개변수 부분 고쳐야될듯
-        public void addUser(UserInfo addUser, string password)
+        public void addUser(TcpUserInfo addUser, string password)
         {
             if (this.password.Equals(password))
             {
@@ -166,14 +171,14 @@ namespace AvalonServer
             }
         }
 
-        public void createRoom(string name, int type, string password, int maxPerson, int number, UserInfo host)
+        public void createRoom(string name, int type, string password, int maxPerson, int number, TcpUserInfo host)
         {
             num = number;
             this.maxPerson = maxPerson;
             
             //memberNickList = new string[maxPerson];
             //memberIndexList = new int[maxPerson];
-            memberInfo = new UserInfo[maxPerson];
+            memberInfo = new TcpUserInfo[maxPerson];
 
             this.name = name;
             this.type = type;

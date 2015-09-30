@@ -190,7 +190,7 @@ namespace AvalonServer
     /// </summary>
     class LobbyForm : CommunicationForm
     {
-        UserInfo userInfo;
+        TcpUserInfo userInfo;
         public LobbyForm()
         {
             formNumber = 1;
@@ -296,7 +296,7 @@ namespace AvalonServer
     
     class RoomForm : CommunicationForm
     {
-        UserInfo userInfo;
+        TcpUserInfo userInfo;
         RoomListProcess roomProcess;
         public RoomForm()
         {
@@ -320,7 +320,7 @@ namespace AvalonServer
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userNick);
                     roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
                     userInfo.Number = -1;
-                    userInfo.State = (int)UserInfo.state.LOBBY;
+                    userInfo.State = (int)TcpUserInfo.state.LOBBY;
                     break;
                 case 12:
 
@@ -345,8 +345,17 @@ namespace AvalonServer
                 case 15:
                     //방장에게는 호스트 및 나머지 유저들의 ip정보를 받고,
                     //나머지에게는 방장의 ip정보를 준다.
-                    
-                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "15" + "01" + connectionThread.clientIpep.Address);
+                    RoomInfo roomInfo = roomListInfo.getRoomInfo(int.Parse(argumentList[1]));
+                    int memberCount = roomInfo.getMemberCount();
+                    string IPList = "";
+                    for (int i = 1; i < memberCount; i++)
+                    {
+                        if (i != 1)
+                            IPList += delimiter;
+                        IPList  += roomInfo.memberInfo[i].IP;
+                        threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
+                    }
+                    threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + (memberCount-1) + IPList);
                     break;
 
             }

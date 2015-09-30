@@ -16,7 +16,7 @@ namespace AvalonServer
         public IPEndPoint clientIpep;
 
         //유저 정보
-        public UserInfo userInfo
+        public TcpUserInfo userInfo
         {
             get;
             set;
@@ -37,7 +37,7 @@ namespace AvalonServer
         /// <param name="threadPool">클라이언트 연결을 관리할 쓰레드 풀</param>
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
-            userInfo = new UserInfo();
+            userInfo = new TcpUserInfo();
             this.client = client;
             threadPoolManage = threadPool;
         }
