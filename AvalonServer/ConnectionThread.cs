@@ -194,6 +194,8 @@ namespace AvalonServer
             }
             ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 0);
             ServerMain.log.setSuccess(true);
+            ServerMain.log.save();//로그 저장
+            ServerMain.log.log();//로그 초기화
             return total;
         }
 
