@@ -93,9 +93,9 @@ namespace AvalonServer
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
                     if (userInfo.userIndex == 0)
-                        ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), clientIpep.ToString(), 1);
+                        ServerMain.Recvlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), clientIpep.ToString(), 1);
                     else
-                        ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 1);
+                        ServerMain.Recvlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 1);
                     // 분할된 데이터 처리
                     comm.process();
 
@@ -114,7 +114,7 @@ namespace AvalonServer
                     
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
-                    ServerMain.log.setSuccess(true);
+                    ServerMain.Recvlog.setSuccess(true);
                 }
                 catch (ArgumentException e)
                 {
@@ -132,8 +132,8 @@ namespace AvalonServer
                 }
                 finally
                 {
-                    ServerMain.log.save();//로그 저장
-                    ServerMain.log.log();//로그 초기화
+                    ServerMain.Recvlog.save();//로그 저장
+                    ServerMain.Recvlog.log();//로그 초기화
                 }
                 Console.WriteLine("********************message process complete*********************\n");
             }
@@ -192,10 +192,10 @@ namespace AvalonServer
                 total += sent;
                 dataleft = -sent;
             }
-            ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 0);
-            ServerMain.log.setSuccess(true);
-            ServerMain.log.save();//로그 저장
-            ServerMain.log.log();//로그 초기화
+            ServerMain.Sendlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 0);
+            ServerMain.Sendlog.setSuccess(true);
+            ServerMain.Sendlog.save();//로그 저장
+            ServerMain.Sendlog.log();//로그 초기화
             return total;
         }
 

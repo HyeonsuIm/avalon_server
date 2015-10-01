@@ -360,10 +360,10 @@ namespace AvalonServer
             string afterQuery;
             query = "insert into avalon.log (L_Operation, L_MessageCheck, L_UserIP, L_SendRecv";
             
-            afterQuery = ") values ("
-            + operation + ","
-            + messageCheck + ","
-            + IP + ","
+            afterQuery = ") values ('"
+            + operation + "',"
+            + messageCheck + ",'"
+            + IP + "',"
             + sendRecv;
             
             if (-1 != index)

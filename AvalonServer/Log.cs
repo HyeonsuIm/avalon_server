@@ -40,8 +40,8 @@ namespace AvalonServer
 
         public void log()
         {
-            opcode = null;
-            IP = null;
+            opcode = "";
+            IP = "";
             messageCheck = 0;
             userIndex = -1;
             sendRecv = -1;
