@@ -129,28 +129,7 @@ namespace AvalonServer
             }
             if (userInfo.State == (int)TcpUserInfo.state.GAME)
             {
-                int roomMaxSize = comm.roomListInfo.roomMaxSize;
-                bool findCheck = false;
-                for (int roomIterator = 0; roomIterator < roomMaxSize; roomIterator++)
-                {
-                    if (comm.roomListInfo.roomInfo[roomIterator] != null)
-                    {
-                        RoomInfo roomInfo = comm.roomListInfo.roomInfo[roomIterator];
-                        int memberCount = roomInfo.getMemberCount();
-                        for (int memberIterator = 0; memberIterator < memberCount; memberIterator++)
-                        {
-                            if (userInfo.userIndex == roomInfo.memberInfo[memberIterator].userIndex)
-                            {
-                                findCheck = true;
-                                comm.roomListInfo.comeOutRoom(roomIterator, userInfo.userIndex);
-                                break;
-                            }
-                        }
-                        if (findCheck)
-                            break;
-                    }
-                }
-
+                comm.roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
             }
             // 연결 종료
             disConnect();

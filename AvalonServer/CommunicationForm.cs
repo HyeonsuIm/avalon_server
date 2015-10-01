@@ -81,8 +81,28 @@ namespace AvalonServer
                     localDB.selectUser(argumentList[0], argumentList[1], out result, out userNick, out userId);
                     if (result != "")
                     {
-                        result = "" + formNumber + opcode + "01" + result;
-                        connectionThread.sendMessage(result);
+                        //중복 로그인 확인부
+                        int[] index = null;
+                        string[] nick = null;
+                        bool check = false;
+                        threadPoolManage.currentUserInfo(ref index, ref nick);
+                        foreach (int i in index)
+                        {
+                            if (i == int.Parse(result))
+                            {
+                                connectionThread.sendMessage("010010");
+                                check = true;
+                            }
+                            if (check)
+                                break;
+                        }
+
+                        //중복이 아닐 시 접속성공
+                        if (!check)
+                        {
+                            result = "" + formNumber + opcode + "01" + result;
+                            connectionThread.sendMessage(result);
+                        }
                     }
                     else
                     {
@@ -316,10 +336,6 @@ namespace AvalonServer
                 case 0:
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
                         break;
-                case 2:
-                    break;
-                case 10:
-                    break;
                 case 11:
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userNick);
                     roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
