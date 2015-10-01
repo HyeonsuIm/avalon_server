@@ -77,6 +77,8 @@ namespace AvalonServer
         public void comeOutRoom(int roomNumber, int memberIndex)
         {
             roomInfo[roomNumber].removeUser(memberIndex);
+            if (roomInfo[roomNumber].getMemberCount() == 0)
+                removeRoom(roomNumber);
         }
 
         private void removeRoom(int number)
@@ -144,8 +146,7 @@ namespace AvalonServer
             {
                 if (memberCount < maxPerson)
                 {
-                    memberInfo[memberCount] = addUser;
-                    
+                    memberInfo[memberCount++] = addUser;
                 }
                 else
                     throw new Exception("인원 수 초과");
@@ -169,6 +170,7 @@ namespace AvalonServer
                 //앞으로 땡김
                 memberInfo[i] = memberInfo[i + 1];
             }
+            memberCount--;
         }
 
         public void createRoom(string name, int type, string password, int maxPerson, int number, TcpUserInfo host)

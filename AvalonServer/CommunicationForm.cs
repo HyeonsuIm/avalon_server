@@ -245,6 +245,7 @@ namespace AvalonServer
                 case 4:
                     try{
                         userInfo = connectionThread.userInfo;
+                        userInfo.State = (int)TcpUserInfo.state.GAME;
                         roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2],int.Parse(argumentList[4]), userInfo);
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
@@ -258,11 +259,11 @@ namespace AvalonServer
                     try
                     {
                         userInfo = connectionThread.userInfo;
+                        userInfo.State = (int)TcpUserInfo.state.GAME;
                         RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
                         int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
-                        
-                        roomListInfo.comeInRoom(number, argumentList[2], userInfo);
 
+                        roomListInfo.comeInRoom(number, argumentList[2], userInfo);
                         
                         bf = new BinaryFormatter();
                         ms = new MemoryStream();
@@ -272,22 +273,25 @@ namespace AvalonServer
 
                         msSize = ms.ToArray().Length;
                         buffer = new byte[msSize + 5];
-                        Encoding.UTF8.GetBytes(""+formNumber+"05"+"01").CopyTo(buffer, 0);
+                        Encoding.UTF8.GetBytes("" + formNumber + "05" + "01").CopyTo(buffer, 0);
                         ms.ToArray().CopyTo(buffer, 5);
                         connectionThread.sendMessage(buffer);
                         RoomInfo roomInfo = roomListInfo.roomInfo[number];
-                        foreach (int memberIndex in roomInfo.getMemberIndexList()) {
-                            if (memberIndex != userInfo.userIndex) {
-                                threadPoolManage.sendToUser(memberIndex, userInfo.userIndex.ToString() + delimiter + userInfo.userNick);
+                        foreach (int memberIndex in roomInfo.getMemberIndexList())
+                        {
+                            if (memberIndex != userInfo.userIndex)
+                            {
+                                threadPoolManage.sendToUser(memberIndex, "" + formNumber + opcode + "02" + userInfo.userIndex.ToString() + delimiter + userInfo.userNick);
                             }
                         }
 
-                        threadPoolManage.sendToUser(roomProcess.getMemberIndexList(number), userInfo.userIndex.ToString());
+                        //threadPoolManage.sendToUser(roomProcess.getMemberIndexList(number), "" + formNumber + "05" + "01" + userInfo.userIndex.ToString());
+                        
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "-1");
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
                     }
                     break;
             }

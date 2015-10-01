@@ -74,6 +74,7 @@ namespace AvalonServer
         public void HandleConnection(Object state)
         {
             connect();
+            CommunicationForm comm = null;
             while (true)
             {
                 try {
@@ -87,7 +88,7 @@ namespace AvalonServer
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     // 데이터를 양식에 맞게 분할
-                    CommunicationForm comm = analysor.separateOpcode();
+                    comm = analysor.separateOpcode();
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
@@ -119,13 +120,35 @@ namespace AvalonServer
                 }
                 catch(Exception e)
                 {
+                    
                     threadPoolManage.removeClient(this);
                     Console.WriteLine(e.Message);
                     break;
                 }
                 Console.WriteLine("********************message process complete*********************\n");
             }
+            if (userInfo.State == (int)TcpUserInfo.state.GAME)
+            {
+                int roomCount = comm.roomListInfo.roomCount;
+                bool findCheck = false;
+                for (int roomIterator = 0; roomIterator < roomCount; roomIterator++)
+                {
+                    RoomInfo roomInfo = comm.roomListInfo.roomInfo[roomIterator];
+                    int memberCount = roomInfo.getMemberCount();
+                    for (int memberIterator = 0; memberIterator < memberCount; memberIterator++)
+                    {
+                        if (userInfo.userIndex == roomInfo.memberInfo[memberIterator].userIndex)
+                        {
+                            findCheck = true;
+                            comm.roomListInfo.comeOutRoom(roomIterator, userInfo.userIndex);
+                            break;
+                        }
+                    }
+                    if (findCheck)
+                        break;
+                }
 
+            }
             // 연결 종료
             disConnect();
         }
@@ -149,7 +172,7 @@ namespace AvalonServer
         public void sendMessage(byte[] byteData)
         {
             Console.WriteLine("<send Message>");
-            //Console.WriteLine("{0}\n", Encoding.ASCII.GetString(data));
+            Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
             sendVarData(byteData);
         }
 
