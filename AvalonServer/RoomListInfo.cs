@@ -46,8 +46,9 @@ namespace AvalonServer
         /// <param name="type">방 타입</param>
         /// <param name="password">방 비밀번호</param>
         /// <param name="member">방장 이름</param>
-        public void addRoom(int type, string name, string password, int maxPerson, TcpUserInfo host)
+        public int addRoom(int type, string name, string password, int maxPerson, TcpUserInfo host)
         {
+
             int number;
             for (number = 0; number < roomMaxSize; number++)
             {
@@ -60,12 +61,21 @@ namespace AvalonServer
             if (roomMaxSize == number)
             {
                 roomMaxSize += IDwidth;
+
+                Array.Resize<RoomInfo>(ref roomInfo, number + 1);
+
                 Array.Resize<RoomInfo>(ref roomInfo, roomMaxSize);
                 Array.Resize<bool>(ref roomNumberUsed, roomMaxSize);
             }
+
+            Console.WriteLine("number : " + number);
+            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+
             roomInfo[number] = new RoomInfo();
             roomInfo[number].createRoom(name, type, password, maxPerson, number, host);
-            roomCount++;
+            this.roomCount++;
+
+            return number;
         }
 
         public int comeInRoom(int roomNumber, string password, TcpUserInfo user)
@@ -84,8 +94,13 @@ namespace AvalonServer
         private void removeRoom(int number)
         {
             roomInfo[number] = null;
+
+            Console.WriteLine("number : " + number);
+            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+
             roomNumberUsed[number] = false;
             roomCount--;
+
         }
 
         public RoomInfo[] getRoomListInfo()
@@ -159,6 +174,8 @@ namespace AvalonServer
 
         public void removeUser(int memberIndex)
         {
+            Console.WriteLine("member User : " + memberCount);
+
             int i;
             for (i = 0; i < memberCount; i++)
             {

@@ -246,7 +246,7 @@ namespace AvalonServer
                     try{
                         userInfo = connectionThread.userInfo;
                         userInfo.State = (int)TcpUserInfo.state.GAME;
-                        roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2],int.Parse(argumentList[4]), userInfo);
+                        userInfo.Number = roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2],int.Parse(argumentList[4]), userInfo);
                         connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
@@ -262,7 +262,7 @@ namespace AvalonServer
                         userInfo.State = (int)TcpUserInfo.state.GAME;
                         RoomListProcess roomProcess = new RoomListProcess(roomListInfo);
                         int number = roomProcess.findRoomNumber(int.Parse(argumentList[1]));
-
+                        userInfo.Number = number;
                         roomListInfo.comeInRoom(number, argumentList[2], userInfo);
                         
                         bf = new BinaryFormatter();
