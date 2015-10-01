@@ -83,7 +83,7 @@ namespace AvalonServer
                     if (data == null)
                         break;
                     Console.WriteLine("\n********************message receive*********************");
-
+                    
                     // 수신 된 데이터를 분석하기 위한 객체 생성
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
@@ -92,7 +92,10 @@ namespace AvalonServer
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
-
+                    if (userInfo.userIndex == 0)
+                        ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), clientIpep.ToString(), 1);
+                    else
+                        ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 1);
                     // 분할된 데이터 처리
                     comm.process();
 
@@ -108,14 +111,16 @@ namespace AvalonServer
                     } 
 
                     // 수신된 데이터 출력
+                    
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
-                    
+                    ServerMain.log.setSuccess(true);
                 }
                 catch (ArgumentException e)
                 {
                     Console.WriteLine("<error>");
                     Console.WriteLine("argument count incorrect\n");
+
 
                 }
                 catch(Exception e)
@@ -124,6 +129,11 @@ namespace AvalonServer
                     threadPoolManage.removeClient(this);
                     Console.WriteLine(e.Message);
                     break;
+                }
+                finally
+                {
+                    ServerMain.log.save();//로그 저장
+                    ServerMain.log.log();//로그 초기화
                 }
                 Console.WriteLine("********************message process complete*********************\n");
             }
@@ -145,6 +155,7 @@ namespace AvalonServer
             Console.WriteLine("{0}\n", data);
             byte[] byteData = Encoding.UTF8.GetBytes(data);
             sendVarData(byteData);
+            
         }
 
         /// <summary>
@@ -156,6 +167,7 @@ namespace AvalonServer
             Console.WriteLine("<send Message>");
             Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
             sendVarData(byteData);
+            
         }
 
         /// <summary>
@@ -180,6 +192,8 @@ namespace AvalonServer
                 total += sent;
                 dataleft = -sent;
             }
+            ServerMain.log.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 0);
+            ServerMain.log.setSuccess(true);
             return total;
         }
 

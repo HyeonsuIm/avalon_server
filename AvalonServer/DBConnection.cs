@@ -355,5 +355,25 @@ namespace AvalonServer
                 Console.WriteLine("update fail\n");
             }
         }
+        public void createLog(int index, string operation, int messageCheck, string IP, int sendRecv)
+        {
+            string afterQuery;
+            query = "insert into avalon.log (L_Operation, L_MessageCheck, L_UserIP, L_SendRecv";
+            
+            afterQuery = ") values ("
+            + operation + ","
+            + messageCheck + ","
+            + IP + ","
+            + sendRecv;
+            
+            if (-1 != index)
+            {
+                query += ", L_UserIndex";
+                afterQuery += "," + index; 
+            }
+            afterQuery += ");";
+            MySqlCommand cmd = new MySqlCommand(query+afterQuery, conn);
+            cmd.ExecuteNonQuery();
+        }
     }
 }

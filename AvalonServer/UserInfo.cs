@@ -12,7 +12,7 @@ namespace AvalonServer
         //유저 정보
         public string userId;
         public string userNick;
-        public int userIndex;
+        public int userIndex=0;
         public string IP;
 
         public enum state { LOBBY = 0, ROOM, GAME };
