@@ -21,14 +21,16 @@ namespace AvalonServer
         public void setLog(string op, string IP, int userIndex, int sendRecv )
         {
             this.opcode = op;
-            this.IP = IP;
             this.sendRecv = sendRecv;
             this.userIndex = userIndex;
+            if (IP != null)
+                this.IP = IP.Split(':')[0];
         }
         public void setLog(string op, string IP, int sendRecv)
         {
             this.opcode = op;
-            this.IP = IP;
+            if (IP != null)
+                this.IP = IP.Split(':')[0];
             this.sendRecv = sendRecv;
         }
         public void setSuccess(bool Check)
@@ -36,7 +38,10 @@ namespace AvalonServer
             if (Check)
                 this.messageCheck = 1;
         }
-
+        public void setIndex(int index)
+        {
+            this.userIndex = index;
+        }
 
         public void log()
         {
@@ -50,6 +55,8 @@ namespace AvalonServer
 
         public void save()
         {
+            if (opcode == "90200")
+                return;
             ServerMain.DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
         }
     }

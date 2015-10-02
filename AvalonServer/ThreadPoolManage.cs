@@ -75,12 +75,14 @@ namespace AvalonServer
 
         public void currentUserInfo(ref int[] index, ref string[] nick)
         {
+            if (clientList.Count == 0)
+                return;
             index = new int[clientList.Count];
             nick = new string[clientList.Count];
             for(int i=0;i<clientList.Count;i++)
             {
-                index[i] = clientList.ElementAt(i).userInfo.userIndex;
                 nick[i] = clientList.ElementAt(i).userInfo.userNick;
+                index[i] = clientList.ElementAt(i).userInfo.userIndex;
             }
         }
 
@@ -102,6 +104,17 @@ namespace AvalonServer
                 {
                     if (memberList[j] == clientList.ElementAt(i).userInfo.userIndex)
                         clientList.ElementAt(i).sendMessage(data);
+                }
+            }
+        }
+
+        public void sendToUser(string data, int currentLocation)
+        {
+            for (int i = 0; i < clientList.Count; i++)
+            {
+                if (currentLocation == clientList.ElementAt(i).userInfo.State)
+                {
+                    clientList.ElementAt(i).sendMessage(data);
                 }
             }
         }

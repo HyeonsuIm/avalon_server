@@ -96,7 +96,7 @@ namespace AvalonServer
                 query += ")";
             
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-                cmd.ExecuteNonQuery();
+                execute(cmd);
 
                 query ="select U_index from user where U_id = '"+ argumentList[0]+ "'" ;
                 da = new MySqlDataAdapter(query, conn);
@@ -105,7 +105,7 @@ namespace AvalonServer
                 DataRow dr = ds.Tables[0].Rows[0];
                 query = "insert into winlate(U_index) values('" + dr["U_index"].ToString()+"')";
                 cmd = new MySqlCommand(query, conn);
-                cmd.ExecuteNonQuery();
+                execute(cmd);
                 
             }
             catch (IndexOutOfRangeException)
@@ -133,7 +133,7 @@ namespace AvalonServer
             query = "insert into winlate(U_index) values(" + userIndex + ")";
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.ExecuteNonQuery();
+            execute(cmd);
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace AvalonServer
                 sql = getSql(winIndex, loseIndex, drawIndex);
 
                 MySqlCommand comm = new MySqlCommand(sql, conn);
-                comm.ExecuteNonQuery();
+                execute(comm);
                 return result;
             }
             catch(Exception)
@@ -346,7 +346,7 @@ namespace AvalonServer
                 query = "update user set U_pw='" + password + "' where U_id='" + id + "'";
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-                cmd.ExecuteNonQuery();
+                execute(cmd);
             }
             catch (MySqlException e)
             {
@@ -356,7 +356,7 @@ namespace AvalonServer
             }
         }
         public void createLog(int index, string operation, int messageCheck, string IP, int sendRecv)
-        {
+         {
             string afterQuery;
             query = "insert into avalon.log (L_Operation, L_MessageCheck, L_UserIP, L_SendRecv";
             
@@ -373,6 +373,13 @@ namespace AvalonServer
             }
             afterQuery += ");";
             MySqlCommand cmd = new MySqlCommand(query+afterQuery, conn);
+            execute(cmd);
+        }
+
+        public void execute(MySqlCommand comm)
+        {
+            MySqlCommand cmd = comm;
+            while (conn.State == ConnectionState.Fetching) { }
             cmd.ExecuteNonQuery();
         }
     }

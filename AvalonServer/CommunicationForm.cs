@@ -102,6 +102,23 @@ namespace AvalonServer
                         {
                             result = "" + formNumber + opcode + "01" + result;
                             connectionThread.sendMessage(result);
+
+                            //string data = "";
+                            
+                            //if (index.Length-1 < 10)
+                            //{
+                            //    data += "" + formNumber + opcode + "0" + (index.Length-1);
+                            //}
+                            //else
+                            //{
+                            //    data += "" + formNumber + opcode + index.Length;
+                            //}
+                            //data += nick[0];
+                            //for (int i = 1; i < index.Length; i++)
+                            //{
+                            //    data += delimiter + nick[i];
+                            //}
+                            //threadPoolManage.sendToUser(data, (int)TcpUserInfo.state.LOBBY);
                         }
                     }
                     else
@@ -252,11 +269,11 @@ namespace AvalonServer
                     userInfo = connectionThread.userInfo;
                     threadPoolManage.currentUserInfo(ref index, ref nick);
 
-                    data += (formNumber*10000 + opcode*100 + (index.Length * 2));
-                    data += index[0] + delimiter + nick[0];
+                    data += (formNumber*10000 + opcode*100 + (index.Length));
+                    data += nick[0];
                     for (int i = 1; i < index.Length;i++ )
                     {
-                        data += delimiter + index[i] + delimiter + nick[i]; 
+                        data += delimiter + nick[i]; 
                     }
 
                     threadPoolManage.sendToUser(userInfo.userIndex, data);
@@ -301,7 +318,7 @@ namespace AvalonServer
                         {
                             if (memberIndex != userInfo.userIndex)
                             {
-                                threadPoolManage.sendToUser(memberIndex, "" + formNumber + opcode + "02" + userInfo.userIndex.ToString() + delimiter + userInfo.userNick);
+                                threadPoolManage.sendToUser(memberIndex, "" + "2" + "10" + "02" + userInfo.userIndex.ToString() + delimiter + userInfo.userNick);
                             }
                         }
 

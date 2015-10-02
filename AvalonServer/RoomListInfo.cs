@@ -182,7 +182,7 @@ namespace AvalonServer
                 if (memberInfo[i].userIndex == memberIndex)
                     break;
             }
-            for (; i < memberCount; i++)
+            for (; i < memberCount-1; i++)
             {
                 //앞으로 땡김
                 memberInfo[i] = memberInfo[i + 1];

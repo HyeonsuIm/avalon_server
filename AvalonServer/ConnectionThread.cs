@@ -38,6 +38,7 @@ namespace AvalonServer
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
             userInfo = new TcpUserInfo();
+            userInfo.State = -1;
             this.client = client;
             threadPoolManage = threadPool;
         }
@@ -102,8 +103,11 @@ namespace AvalonServer
                     // 예외처리
                     if (comm.formNumber == 0 && comm.opcode == 10)
                     {
-                       userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
-                       userInfo.IP = clientIpep.ToString();
+                        userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
+                        userInfo.IP = clientIpep.ToString();
+                        userInfo.State = (int)TcpUserInfo.state.LOBBY;
+                        ServerMain.Recvlog.setIndex(userInfo.userIndex);
+
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {
@@ -116,12 +120,10 @@ namespace AvalonServer
                     Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
                     ServerMain.Recvlog.setSuccess(true);
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
                     Console.WriteLine("<error>");
                     Console.WriteLine("argument count incorrect\n");
-
-
                 }
                 catch(Exception e)
                 {
