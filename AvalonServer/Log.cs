@@ -18,20 +18,21 @@ namespace AvalonServer
         int userIndex;
         int sendRecv;
 
-        public void setLog(string op, string IP, int userIndex, int sendRecv )
+        public void setOperation(string OP, int sendRecv)
         {
-            this.opcode = op;
+            this.opcode = OP;
             this.sendRecv = sendRecv;
+        }
+        public void setLog(string IP, int userIndex)
+        {
             this.userIndex = userIndex;
             if (IP != null)
                 this.IP = IP.Split(':')[0];
         }
-        public void setLog(string op, string IP, int sendRecv)
+        public void setLog(string IP)
         {
-            this.opcode = op;
             if (IP != null)
                 this.IP = IP.Split(':')[0];
-            this.sendRecv = sendRecv;
         }
         public void setSuccess(bool Check)
         {

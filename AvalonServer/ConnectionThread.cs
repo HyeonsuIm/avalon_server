@@ -81,6 +81,7 @@ namespace AvalonServer
                 try {
                     // 데이터 수신 대기 및 수신
                     data = receiveVarData();
+                    ServerMain.Recvlog.setOperation(Encoding.ASCII.GetString(data), 1);
                     if (data == null)
                         break;
                     Console.WriteLine("\n********************message receive*********************");
@@ -94,9 +95,9 @@ namespace AvalonServer
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
                     if (userInfo.userIndex == 0)
-                        ServerMain.Recvlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), clientIpep.ToString(), 1);
+                        ServerMain.Recvlog.setLog(clientIpep.ToString());
                     else
-                        ServerMain.Recvlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 1);
+                        ServerMain.Recvlog.setLog(userInfo.IP, userInfo.userIndex);
                     // 분할된 데이터 처리
                     comm.process();
 
@@ -184,6 +185,12 @@ namespace AvalonServer
             int dataleft = size;
             int sent;
 
+            ServerMain.Sendlog.setOperation(Encoding.UTF8.GetString(data).Trim('\0'), 0);
+            ServerMain.Sendlog.setLog(userInfo.IP, userInfo.userIndex);
+            ServerMain.Sendlog.setSuccess(true);
+            ServerMain.Sendlog.save();//로그 저장
+            ServerMain.Sendlog.log();//로그 초기화
+
             byte[] datasize = new byte[4];
             datasize = BitConverter.GetBytes(size);
             sent = client.Send(datasize);
@@ -194,10 +201,7 @@ namespace AvalonServer
                 total += sent;
                 dataleft = -sent;
             }
-            ServerMain.Sendlog.setLog(Encoding.UTF8.GetString(data).Trim('\0'), userInfo.IP, userInfo.userIndex, 0);
-            ServerMain.Sendlog.setSuccess(true);
-            ServerMain.Sendlog.save();//로그 저장
-            ServerMain.Sendlog.log();//로그 초기화
+            
             return total;
         }
 
