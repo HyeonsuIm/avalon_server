@@ -19,7 +19,7 @@ namespace AvalonServer
         string ID = "avalon";
         string PW = "AvalonPw";
         string database = "avalon";
-
+        bool executeCheck = false;
         /// <summary>
         /// 서버 DB 접속
         /// </summary>
@@ -378,9 +378,11 @@ namespace AvalonServer
 
         public void execute(MySqlCommand comm)
         {
+            while (executeCheck) { }
+            executeCheck = true;
             MySqlCommand cmd = comm;
-            while (conn.State == ConnectionState.Fetching) { }
             cmd.ExecuteNonQuery();
+            executeCheck = false;
         }
     }
 }
