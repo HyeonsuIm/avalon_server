@@ -399,6 +399,7 @@ namespace AvalonServer
                         threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
                     }
                     threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + (memberCount-1) + IPList);
+                    roomInfo.state = 1; // 게임중으로 변경
                     break;
                 //준비
                 case 16:
