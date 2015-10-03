@@ -351,9 +351,11 @@ namespace AvalonServer
             RoomInfo roomInfo;
             switch (opcode)
             {
+                //방 채팅
                 case 0:
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
                         break;
+                //방 접속 종료
                 case 11:
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userIndex);
                     roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
@@ -363,6 +365,7 @@ namespace AvalonServer
                 case 12:
 
                     break;
+                //방 수정
                 case 13:
                     try
                     {
@@ -375,11 +378,13 @@ namespace AvalonServer
                         connectionThread.sendMessage("" + formNumber + "13" + "01" + "0");
                     }
                     break;
+                //방 삭제
                 case 14:
                     
                     roomProcess.removeRoom(userInfo.Number);
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "14" + "01" + userInfo.userIndex);
                     break;
+                //게임 시작
                 case 15:
                     //방장에게는 호스트 및 나머지 유저들의 ip정보를 받고,
                     //나머지에게는 방장의 ip정보를 준다.
@@ -395,6 +400,7 @@ namespace AvalonServer
                     }
                     threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + (memberCount-1) + IPList);
                     break;
+                //준비
                 case 16:
                     roomInfo = roomListInfo.getRoomInfo(userInfo.Number);
                     if (argumentList[0] == "1")
@@ -405,7 +411,7 @@ namespace AvalonServer
                     {
                         roomInfo.ready(userInfo.userIndex, false);
                     }
-                    threadPoolManage.sendToUser(roomInfo.getMemberIndexList(), "" + formNumber + "16" + "01" + argumentList[0]);
+                    threadPoolManage.sendToUser(roomInfo.getMemberIndexList(), "" + formNumber + "16" + "02" + argumentList[0] + delimiter + userInfo.userIndex);
                     break;
             }
         }

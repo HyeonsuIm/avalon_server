@@ -21,7 +21,7 @@ namespace AvalonServer
 
         public bool garbageCheck()
         {
-            Console.WriteLine(opcode);
+            //Console.WriteLine(opcode);
             if (opcode == "" || opcode == null) { }
             else if (opcode.Equals("90200"))
                 return false;

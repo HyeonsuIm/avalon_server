@@ -125,6 +125,7 @@ namespace AvalonServer
     public class RoomInfo
     {
         int maxPerson;
+        int minPerson;
         string name;
         int type;
         int num;
@@ -197,7 +198,7 @@ namespace AvalonServer
         {
             num = number;
             this.maxPerson = maxPerson;
-            
+            this.minPerson = typetoMinPerson();
             //memberNickList = new string[maxPerson];
             //memberIndexList = new int[maxPerson];
             memberInfo = new TcpUserInfo[maxPerson];
@@ -243,6 +244,12 @@ namespace AvalonServer
                     break;
                 }
             }
+        }
+        int typetoMinPerson()
+        {
+            if (type == 0)
+                return 5;
+            return -1;
         }
     }
 }

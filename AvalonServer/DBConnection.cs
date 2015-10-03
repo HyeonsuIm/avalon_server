@@ -28,7 +28,7 @@ namespace AvalonServer
             try {
                 conn = new MySqlConnection(@"server="+IP+";userid="+ID+";password="+PW+";database="+database+";");
                 conn.Open();
-                Console.WriteLine("DB connection success\n");
+                //Console.WriteLine("DB connection success\n");
             }catch(MySqlException)
             {
                 Console.WriteLine("error");

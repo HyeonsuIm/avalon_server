@@ -26,7 +26,7 @@ namespace AvalonServer
 
         // 데이터 송수신용
         byte[] data;
-
+        string opcode;
         // 연결 수
         private static int connections = 0;
 
@@ -40,7 +40,9 @@ namespace AvalonServer
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
             userInfo = new TcpUserInfo();
+            clientIpep = (IPEndPoint)client.RemoteEndPoint;
             userInfo.State = -1;
+            userInfo.IP = clientIpep.ToString();
             this.client = client;
             threadPoolManage = threadPool;
         }
@@ -95,13 +97,14 @@ namespace AvalonServer
                         break;
 
                     recvLog.setOperation(Encoding.ASCII.GetString(data).Trim('\0'), 1);
-                    Console.WriteLine("\n********************message receive*********************");
-                    
+                    opcode = Encoding.ASCII.GetString(data).Trim('\0').Substring(0, 5);
+                    if (printCheck(opcode))
+                        Console.WriteLine("\n********************message receive*********************");
                     // 수신 된 데이터를 분석하기 위한 객체 생성
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     // 데이터를 양식에 맞게 분할
-                    comm = analysor.separateOpcode();
+                    comm = analysor.separateOpcode(printCheck(opcode));
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
@@ -129,7 +132,8 @@ namespace AvalonServer
                     // 수신된 데이터 출력
                     
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
-                    Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
+                    if (printCheck(Encoding.ASCII.GetString(data).Trim('\0')))
+                        Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
                     recvLog.setSuccess(true);
                 }
                 catch (ArgumentException ex)
@@ -143,7 +147,6 @@ namespace AvalonServer
                 }
                 catch(Exception e)
                 {
-                    
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<error>\n" + e.Message + "\n");
                     recvLog.setSuccess(false);
@@ -156,7 +159,8 @@ namespace AvalonServer
                 {
                     recvLog.save();//로그 저장
                 }
-                Console.WriteLine("********************message process complete*********************\n");
+                if (printCheck(opcode))
+                    Console.WriteLine("********************message process complete*********************\n");
             }
             if (userInfo.State == (int)TcpUserInfo.state.GAME)
             {
@@ -166,14 +170,26 @@ namespace AvalonServer
             disConnect();
         }
 
+        bool printCheck(string opcode)
+        {
+            if (opcode == "90200")
+                return false;
+            else if (opcode == "10300")
+                return false;
+            return true;
+        }
+
         /// <summary>
         /// string 데이터 송신
         /// </summary>
         /// <param name="data">송신할 문자열</param>
         public void sendMessage(string data)
         {
-            Console.WriteLine("<send Message>");
-            Console.WriteLine("{0}\n", data);
+            if (printCheck(opcode))
+            {
+                Console.WriteLine("<send Message>");
+                Console.WriteLine("{0}\n", data);
+            }
             byte[] byteData = Encoding.UTF8.GetBytes(data);
             sendVarData(byteData);
             
@@ -185,8 +201,11 @@ namespace AvalonServer
         /// <param name="byteData">송신할 데이터</param>
         public void sendMessage(byte[] byteData)
         {
-            Console.WriteLine("<send Message>");
-            Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
+            if (printCheck(opcode))
+            {
+                Console.WriteLine("<send Message>");
+                Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
+            } 
             sendVarData(byteData);
             
         }
