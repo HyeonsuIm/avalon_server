@@ -226,6 +226,8 @@ namespace AvalonServer
             roomInfo[5] = num.ToString();
             for (int i = 0; i < memberInfo.Length; i++)
             {
+                if (memberInfo[i] == null)
+                    break;
                 roomInfo[i + 6] = memberInfo[i].userNick;
             }
             return roomInfo;
