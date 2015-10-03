@@ -17,9 +17,22 @@ namespace AvalonServer
         int messageCheck;
         int userIndex;
         int sendRecv;
+        DBConnection DBC;
 
+        public bool garbageCheck()
+        {
+            Console.WriteLine(opcode);
+            if (opcode == "" || opcode == null) { }
+            else if (opcode.Equals("90200"))
+                return false;
+            else if (opcode.Substring(0, 3).Equals("103"))
+                return false;
+
+            return true;
+        }
         public void setOperation(string OP, int sendRecv)
         {
+
             this.opcode = OP;
             this.sendRecv = sendRecv;
         }
@@ -38,13 +51,15 @@ namespace AvalonServer
         {
             if (Check)
                 this.messageCheck = 1;
+            else
+                this.messageCheck = 0;
         }
         public void setIndex(int index)
         {
             this.userIndex = index;
         }
 
-        public void log()
+        public Log()
         {
             opcode = "";
             IP = "";
@@ -56,9 +71,10 @@ namespace AvalonServer
 
         public void save()
         {
-            if (opcode == "90200")
-                return;
-            ServerMain.DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
+            DBC = new DBConnection();
+            DBC.connect();
+            if (garbageCheck())
+                DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
         }
     }
 

@@ -69,7 +69,8 @@ namespace AvalonServer
             }
 
             Console.WriteLine("number : " + number);
-            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+            Console.WriteLine("roomInfo.size : " + roomInfo.Length);
+            Console.WriteLine("room count : " + roomCount + "\n");
 
             roomInfo[number] = new RoomInfo();
             roomInfo[number].createRoom(name, type, password, maxPerson, number, host);
@@ -96,7 +97,8 @@ namespace AvalonServer
             roomInfo[number] = null;
 
             Console.WriteLine("number : " + number);
-            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+            Console.WriteLine("roomInfo.size : " + roomInfo.Length);
+            Console.WriteLine("room count : " + roomCount + "\n");
 
             roomNumberUsed[number] = false;
             roomCount--;
@@ -134,7 +136,7 @@ namespace AvalonServer
         //int[] memberIPList;
         
         public TcpUserInfo[] memberInfo;
-
+        public bool[] readyState;
 
         public int getMemberCount()
         {
@@ -162,6 +164,7 @@ namespace AvalonServer
                 if (memberCount < maxPerson)
                 {
                     memberInfo[memberCount++] = addUser;
+
                 }
                 else
                     throw new Exception("인원 수 초과");
@@ -198,6 +201,7 @@ namespace AvalonServer
             //memberNickList = new string[maxPerson];
             //memberIndexList = new int[maxPerson];
             memberInfo = new TcpUserInfo[maxPerson];
+            readyState = new bool[maxPerson];
 
             this.name = name;
             this.type = type;
@@ -227,6 +231,18 @@ namespace AvalonServer
             this.type = type;
             this.name = name;
             this.password = password;
+        }
+        
+        public void ready(int userIndex, bool check)
+        {
+            for (int i = 0; i < memberCount; i++)
+            {
+                if (memberInfo[i].userIndex == userIndex)
+                {
+                    readyState[i] = check;
+                    break;
+                }
+            }
         }
     }
 }

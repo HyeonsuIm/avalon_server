@@ -10,8 +10,6 @@ namespace AvalonServer
     class ServerMain
     {
         public static DBConnection DBC = new DBConnection();
-        public static Log Sendlog = new Log();
-        public static Log Recvlog = new Log();
         static void Main(string[] args)
         {
             Console.WriteLine("---------------Server Start----------------");

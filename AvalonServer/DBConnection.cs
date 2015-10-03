@@ -359,9 +359,13 @@ namespace AvalonServer
          {
             string afterQuery;
             query = "insert into avalon.log (L_Operation, L_MessageCheck, L_UserIP, L_SendRecv";
-            
-            afterQuery = ") values ('"
-            + operation + "',"
+
+            afterQuery = ") values ('";
+
+
+            if(operation != null)
+                afterQuery += operation.Replace("\'", "\\\'");
+            afterQuery +="',"
             + messageCheck + ",'"
             + IP + "',"
             + sendRecv;
