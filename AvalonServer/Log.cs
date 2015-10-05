@@ -19,7 +19,7 @@ namespace AvalonServer
         public Log()
         {
             string sDirPath;
-            sDirPath = System.ApplicationId.StartupPath + "\\images";
+            sDirPath = "\\images";
             DirectoryInfo di = new DirectoryInfo(sDirPath);
             if (di.Exists == false)
             {
