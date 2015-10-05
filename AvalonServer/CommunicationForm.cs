@@ -452,7 +452,7 @@ namespace AvalonServer
 
                     DBConnection localDB = ServerMain.DBC;
                     int result;
-                    result = localDB.setWinLose(argumentList);
+                    result = localDB.setWinLose(int.Parse(argumentList[0]),argumentList[1]);
                     break;
             }
         }
