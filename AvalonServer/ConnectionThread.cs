@@ -151,6 +151,7 @@ namespace AvalonServer
                 {
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<socket error>\n" + e.Message + "\n");
+                    break;
                 }
                 catch(Exception e)
                 {
