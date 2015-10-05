@@ -23,6 +23,9 @@ namespace AvalonServer
         /// <returns>각 영역별로 나뉜 데이터를 저장한 객체 반환</returns>
         public CommunicationForm separateOpcode(bool printCheck)
         {
+            if (dataString.Length < 5)
+                throw new ArgumentException("opcode 길이가 5이하입니다.(1)");
+
             if (printCheck)
             {
                 Console.WriteLine("<received data>");
@@ -87,6 +90,10 @@ namespace AvalonServer
             int argumentCount = int.Parse(dataString.Substring(3, 2));
             if (argumentCount == 0)
             {
+                if(dataString.Length != 5)
+                {
+                    throw new ArgumentException("opcode와 매개변수 개수가 틀립니다.");
+                }
                 return null;
             }
             
@@ -97,7 +104,7 @@ namespace AvalonServer
             
             if (argumentCount != argumentList.Length)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("opcode와 매개변수 개수가 틀립니다.");
             }
 
             return argumentList;

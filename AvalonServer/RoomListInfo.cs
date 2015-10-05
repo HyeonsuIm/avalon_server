@@ -88,7 +88,7 @@ namespace AvalonServer
         public void comeOutRoom(int roomNumber, int memberIndex)
         {
             roomInfo[roomNumber].removeUser(memberIndex);
-            if (roomInfo[roomNumber].getMemberCount() == 0)
+            if (roomInfo[roomNumber].getMemberCount() <= 0)
                 removeRoom(roomNumber);
         }
 

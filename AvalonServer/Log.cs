@@ -71,10 +71,11 @@ namespace AvalonServer
 
         public void save()
         {
-            DBC = new DBConnection();
-            DBC.connect();
-            if (garbageCheck())
-                DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
+            //DBC = new DBConnection();
+            //DBC.connect();
+            //if (garbageCheck())
+            //    DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
+            
         }
     }
 

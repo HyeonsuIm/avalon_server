@@ -391,14 +391,17 @@ namespace AvalonServer
                     roomInfo = roomListInfo.getRoomInfo(int.Parse(argumentList[1]));
                     int memberCount = roomInfo.getMemberCount();
                     string IPList = "";
-                    for (int i = 1; i < memberCount; i++)
+                    for (int i = 0; i < memberCount; i++)
                     {
-                        if (i != 1)
+                        if (i != 0)
                             IPList += delimiter;
                         IPList  += roomInfo.memberInfo[i].IP;
-                        threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
+                        if (i != 0)
+                        {
+                            threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
+                        }
                     }
-                    threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + (memberCount-1) + IPList);
+                    threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + memberCount + IPList);
                     roomInfo.state = 1; // 게임중으로 변경
                     break;
                 //준비
@@ -429,17 +432,24 @@ namespace AvalonServer
         {
             switch (opcode)
             {
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
                 case 99:
+                    
+                    BinaryFormatter bf;
+                    MemoryStream ms;
+                    bf = new BinaryFormatter();
+                    ms = new MemoryStream();
+                    bf.Serialize(ms, threadPoolManage.roomListInfo.roomInfo[connectionThread.userInfo.Number]);
+
+                    ms.Position = 0;
+
+                    int msSize = ms.ToArray().Length;
+                    byte[] buffer = new byte[msSize + 5];
+                    Encoding.UTF8.GetBytes("" + formNumber + "99" + "01").CopyTo(buffer, 0);
+                    ms.ToArray().CopyTo(buffer, 5);
+
+                    connectionThread.sendMessage(buffer);
+
+
                     DBConnection localDB = ServerMain.DBC;
                     int result;
                     result = localDB.setWinLose(argumentList);

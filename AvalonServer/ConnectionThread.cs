@@ -44,6 +44,8 @@ namespace AvalonServer
             userInfo.State = -1;
             userInfo.IP = clientIpep.ToString();
             this.client = client;
+            //client.SendTimeout = 10000;
+            //client.ReceiveTimeout = 10000;
             threadPoolManage = threadPool;
         }
         
@@ -96,7 +98,7 @@ namespace AvalonServer
                     if (data == null)
                         break;
 
-                    recvLog.setOperation(Encoding.ASCII.GetString(data).Trim('\0'), 1);
+                    //recvLog.setOperation(Encoding.ASCII.GetString(data).Trim('\0'), 1);
                     opcode = Encoding.ASCII.GetString(data).Trim('\0').Substring(0, 5);
                     if (printCheck(opcode))
                         Console.WriteLine("\n********************message receive*********************");
@@ -138,12 +140,17 @@ namespace AvalonServer
                 }
                 catch (ArgumentException ex)
                 {
-                    Console.WriteLine("<error>");
-                    Console.WriteLine("argument count incorrect\n");
+                    Console.WriteLine("<argument error>");
+                    Console.WriteLine(ex.Message + "\n");
                     recvLog.setSuccess(false);
                     recvLog.save();
                     recvLog = new Log();
                     recvLog.setOperation(ex.Message,1);
+                }
+                catch(SocketException e)
+                {
+                    threadPoolManage.removeClient(this);
+                    Console.WriteLine("<socket error>\n" + e.Message + "\n");
                 }
                 catch(Exception e)
                 {
@@ -247,27 +254,44 @@ namespace AvalonServer
         /// 가변 데이터 수신
         /// </summary>
         /// <returns>수신된 데이터</returns>
-        private byte[] receiveVarData(){
+        private byte[] receiveVarData() {
             int total = 0;
             int recv;
             byte[] datasize = new byte[4];
-            recv = client.Receive(datasize,0,4,0);
-            if (recv == 0)
-                return null;
-            int size = BitConverter.ToInt32(datasize,0);
-            int dataleft = size;
-            byte[] data = new byte[size];
-
-            while(total < size){
-                recv = client.Receive(data,total,dataleft,0);
-                if(recv == 0)
-                {
-                    data = Encoding.UTF8.GetBytes("exit");
-                    break;
-                }
-                total += recv;
-                dataleft -= recv;
+            try
+            {
+                recv = client.Receive(datasize, 0, 4, 0);
             }
+            catch (SocketException e)
+            {
+                throw e;
+            }
+            
+                if (recv == 0)
+                    return null;
+                int size = BitConverter.ToInt32(datasize, 0);
+                int dataleft = size;
+                byte[] data = new byte[size];
+            try
+            {
+                while (total < size)
+                {
+                    recv = client.Receive(data, total, dataleft, 0);
+                    if (recv == 0)
+                    {
+                        data = Encoding.UTF8.GetBytes("exit");
+                        break;
+                    }
+                    total += recv;
+                    dataleft -= recv;
+                }
+            }
+            catch (SocketException e)
+            {
+                throw e;
+            }
+
+
             return data;
         }
     }
