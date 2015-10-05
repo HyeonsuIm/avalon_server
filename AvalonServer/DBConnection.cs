@@ -398,7 +398,6 @@ namespace AvalonServer
             executeCheck = true;
             MySqlCommand cmd = comm;
             cmd.ExecuteNonQuery();
-            disConnect();
             executeCheck = false;
         }
     }
