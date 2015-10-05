@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,54 +13,22 @@ namespace AvalonServer
     /// </summary>
     class Log
     {
-        string opcode;
-        string IP;
-        int messageCheck;
-        int userIndex;
-        int sendRecv;
 
-        public void setOperation(string OP, int sendRecv)
+        string fileName;
+        FileStream filestreamer;
+        public Log()
         {
-            this.opcode = OP;
-            this.sendRecv = sendRecv;
-        }
-        public void setLog(string IP, int userIndex)
-        {
-            this.userIndex = userIndex;
-            if (IP != null)
-                this.IP = IP.Split(':')[0];
-        }
-        public void setLog(string IP)
-        {
-            if (IP != null)
-                this.IP = IP.Split(':')[0];
-        }
-        public void setSuccess(bool Check)
-        {
-            if (Check)
-                this.messageCheck = 1;
-        }
-        public void setIndex(int index)
-        {
-            this.userIndex = index;
-        }
-
-        public void log()
-        {
-            opcode = "";
-            IP = "";
-            messageCheck = 0;
-            userIndex = -1;
-            sendRecv = -1;
+            string sDirPath;
+            sDirPath = System.ApplicationId.StartupPath + "\\images";
+            DirectoryInfo di = new DirectoryInfo(sDirPath);
+            if (di.Exists == false)
+            {
+                di.Create();
+            }
+            fileName = System.DateTime.Now.ToString("yyyy-MM-dd");
+            filestreamer = File.Create(fileName);
         }
         
-
-        public void save()
-        {
-            if (opcode == "90200")
-                return;
-            ServerMain.DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
-        }
     }
 
     
