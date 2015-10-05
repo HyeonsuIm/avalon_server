@@ -243,7 +243,7 @@ namespace AvalonServer
             {
                 // 채팅
                 case 0:
-                    threadPoolManage.sendToAll(formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
+                    threadPoolManage.sendToUser(formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1], (int)TcpUserInfo.state.LOBBY);
                     break;
                 
                 // 방정보 요청
@@ -284,10 +284,10 @@ namespace AvalonServer
                         userInfo = connectionThread.userInfo;
                         userInfo.State = (int)TcpUserInfo.state.GAME;
                         userInfo.Number = roomListInfo.addRoom(Int16.Parse(argumentList[0]), argumentList[1], argumentList[2],int.Parse(argumentList[4]), userInfo);
-                        connectionThread.sendMessage("" + formNumber + "04" + "01" + "1");
+                        connectionThread.sendMessage("" + formNumber + "04" + "01" + userInfo.Number);
                     }catch(Exception e){
                         Console.WriteLine(e.Message);
-                        connectionThread.sendMessage("" + formNumber + "04" + "01" + "0");
+                        connectionThread.sendMessage("" + formNumber + "04" + "01" + "-1");
                     }
                     
                     break;
@@ -348,13 +348,16 @@ namespace AvalonServer
         {
             roomProcess = new RoomListProcess(roomListInfo);
             userInfo = connectionThread.userInfo;
+            RoomInfo roomInfo;
             switch (opcode)
             {
+                //방 채팅
                 case 0:
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "00" + "02" + argumentList[0] + delimiter + argumentList[1]);
                         break;
+                //방 접속 종료
                 case 11:
-                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userNick);
+                    threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "11" + "01" + userInfo.userIndex);
                     roomListInfo.comeOutRoom(userInfo.Number, userInfo.userIndex);
                     userInfo.Number = -1;
                     userInfo.State = (int)TcpUserInfo.state.LOBBY;
@@ -362,6 +365,7 @@ namespace AvalonServer
                 case 12:
 
                     break;
+                //방 수정
                 case 13:
                     try
                     {
@@ -374,27 +378,45 @@ namespace AvalonServer
                         connectionThread.sendMessage("" + formNumber + "13" + "01" + "0");
                     }
                     break;
+                //방 삭제
                 case 14:
                     
                     roomProcess.removeRoom(userInfo.Number);
                     threadPoolManage.sendToUser(roomProcess.getMemberIndexList(userInfo.Number), "" + formNumber + "14" + "01" + userInfo.userIndex);
                     break;
+                //게임 시작
                 case 15:
                     //방장에게는 호스트 및 나머지 유저들의 ip정보를 받고,
                     //나머지에게는 방장의 ip정보를 준다.
-                    RoomInfo roomInfo = roomListInfo.getRoomInfo(int.Parse(argumentList[1]));
+                    roomInfo = roomListInfo.getRoomInfo(int.Parse(argumentList[1]));
                     int memberCount = roomInfo.getMemberCount();
                     string IPList = "";
-                    for (int i = 1; i < memberCount; i++)
+                    for (int i = 0; i < memberCount; i++)
                     {
-                        if (i != 1)
+                        if (i != 0)
                             IPList += delimiter;
                         IPList  += roomInfo.memberInfo[i].IP;
-                        threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
+                        if (i != 0)
+                        {
+                            threadPoolManage.sendToUser(roomInfo.memberInfo[i].userIndex, "" + formNumber + "15" + "01" + roomInfo.memberInfo[0].IP);
+                        }
                     }
-                    threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + (memberCount-1) + IPList);
+                    threadPoolManage.sendToUser(roomInfo.memberInfo[0].userIndex, "" + formNumber + "15" + "0" + memberCount + IPList);
+                    roomInfo.state = 1; // 게임중으로 변경
                     break;
-
+                //준비
+                case 16:
+                    roomInfo = roomListInfo.getRoomInfo(userInfo.Number);
+                    if (argumentList[0] == "1")
+                    {
+                        roomInfo.ready(userInfo.userIndex, true);
+                    }
+                    else
+                    {
+                        roomInfo.ready(userInfo.userIndex, false);
+                    }
+                    threadPoolManage.sendToUser(roomInfo.getMemberIndexList(), "" + formNumber + "16" + "02" + argumentList[0] + delimiter + userInfo.userIndex);
+                    break;
             }
         }
     }
@@ -410,17 +432,24 @@ namespace AvalonServer
         {
             switch (opcode)
             {
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
                 case 99:
+                    
+                    BinaryFormatter bf;
+                    MemoryStream ms;
+                    bf = new BinaryFormatter();
+                    ms = new MemoryStream();
+                    bf.Serialize(ms, threadPoolManage.roomListInfo.roomInfo[connectionThread.userInfo.Number]);
+
+                    ms.Position = 0;
+
+                    int msSize = ms.ToArray().Length;
+                    byte[] buffer = new byte[msSize + 5];
+                    Encoding.UTF8.GetBytes("" + formNumber + "99" + "01").CopyTo(buffer, 0);
+                    ms.ToArray().CopyTo(buffer, 5);
+
+                    connectionThread.sendMessage(buffer);
+
+
                     DBConnection localDB = ServerMain.DBC;
                     int result;
                     result = localDB.setWinLose(argumentList);

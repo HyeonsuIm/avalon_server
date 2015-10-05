@@ -14,7 +14,9 @@ namespace AvalonServer
         Socket client;
         // 클라이언트 접속 IP
         public IPEndPoint clientIpep;
-
+        //로그 기록을 위한 Log 객체 선언
+        Log recvLog;
+        Log sendLog;
         //유저 정보
         public TcpUserInfo userInfo
         {
@@ -24,7 +26,7 @@ namespace AvalonServer
 
         // 데이터 송수신용
         byte[] data;
-
+        string opcode;
         // 연결 수
         private static int connections = 0;
 
@@ -38,8 +40,12 @@ namespace AvalonServer
         public ConnectionThread(ref Socket client, ThreadPoolManage threadPool)
         {
             userInfo = new TcpUserInfo();
+            clientIpep = (IPEndPoint)client.RemoteEndPoint;
             userInfo.State = -1;
+            userInfo.IP = clientIpep.ToString();
             this.client = client;
+            //client.SendTimeout = 10000;
+            //client.ReceiveTimeout = 10000;
             threadPoolManage = threadPool;
         }
         
@@ -62,10 +68,17 @@ namespace AvalonServer
         /// </summary>
         void disConnect()
         {
-            client.Close();
-            threadPoolManage.removeClient(this);
-            connections--;
-            Console.WriteLine("Client disconnect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
+            try {
+                client.Close();
+                threadPoolManage.removeClient(this);
+                connections--;
+                Console.WriteLine("Client disconnect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
+            }catch(Exception e)
+            {
+                Console.WriteLine("??????????????????????????????????????????????????????????????????????????????\n");
+                Console.WriteLine(e.Message);
+
+            }
         }
 
         /// <summary>
@@ -78,26 +91,29 @@ namespace AvalonServer
             CommunicationForm comm = null;
             while (true)
             {
+                recvLog = new Log();
                 try {
                     // 데이터 수신 대기 및 수신
                     data = receiveVarData();
-                    ServerMain.Recvlog.setOperation(Encoding.ASCII.GetString(data), 1);
                     if (data == null)
                         break;
-                    Console.WriteLine("\n********************message receive*********************");
-                    
+
+                    //recvLog.setOperation(Encoding.ASCII.GetString(data).Trim('\0'), 1);
+                    opcode = Encoding.ASCII.GetString(data).Trim('\0').Substring(0, 5);
+                    if (printCheck(opcode))
+                        Console.WriteLine("\n********************message receive*********************");
                     // 수신 된 데이터를 분석하기 위한 객체 생성
                     OpcodeAnalysor analysor = new OpcodeAnalysor(data);
                     
                     // 데이터를 양식에 맞게 분할
-                    comm = analysor.separateOpcode();
+                    comm = analysor.separateOpcode(printCheck(opcode));
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
                     if (userInfo.userIndex == 0)
-                        ServerMain.Recvlog.setLog(clientIpep.ToString());
+                        recvLog.setLog(clientIpep.ToString());
                     else
-                        ServerMain.Recvlog.setLog(userInfo.IP, userInfo.userIndex);
+                        recvLog.setLog(userInfo.IP, userInfo.userIndex);
                     // 분할된 데이터 처리
                     comm.process();
 
@@ -107,7 +123,7 @@ namespace AvalonServer
                         userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
                         userInfo.IP = clientIpep.ToString();
                         userInfo.State = (int)TcpUserInfo.state.LOBBY;
-                        ServerMain.Recvlog.setIndex(userInfo.userIndex);
+                        recvLog.setIndex(userInfo.userIndex);
 
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
@@ -118,27 +134,40 @@ namespace AvalonServer
                     // 수신된 데이터 출력
                     
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
-                    Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
-                    ServerMain.Recvlog.setSuccess(true);
+                    if (printCheck(Encoding.ASCII.GetString(data).Trim('\0')))
+                        Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
+                    recvLog.setSuccess(true);
                 }
-                catch (ArgumentException)
+                catch (ArgumentException ex)
                 {
-                    Console.WriteLine("<error>");
-                    Console.WriteLine("argument count incorrect\n");
+                    Console.WriteLine("<argument error>");
+                    Console.WriteLine(ex.Message + "\n");
+                    recvLog.setSuccess(false);
+                    recvLog.save();
+                    recvLog = new Log();
+                    recvLog.setOperation(ex.Message,1);
+                }
+                catch(SocketException e)
+                {
+                    threadPoolManage.removeClient(this);
+                    Console.WriteLine("<socket error>\n" + e.Message + "\n");
                 }
                 catch(Exception e)
                 {
-                    
                     threadPoolManage.removeClient(this);
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine("<error>\n" + e.Message + "\n");
+                    recvLog.setSuccess(false);
+                    recvLog.save();
+                    recvLog = new Log();
+                    recvLog.setOperation(e.Message, 1);
                     break;
                 }
                 finally
                 {
-                    ServerMain.Recvlog.save();//로그 저장
-                    ServerMain.Recvlog.log();//로그 초기화
+                    recvLog.save();//로그 저장
                 }
-                Console.WriteLine("********************message process complete*********************\n");
+                if (printCheck(opcode))
+                    Console.WriteLine("********************message process complete*********************\n");
             }
             if (userInfo.State == (int)TcpUserInfo.state.GAME)
             {
@@ -148,14 +177,26 @@ namespace AvalonServer
             disConnect();
         }
 
+        bool printCheck(string opcode)
+        {
+            if (opcode == "90200")
+                return false;
+            else if (opcode == "10300")
+                return false;
+            return true;
+        }
+
         /// <summary>
         /// string 데이터 송신
         /// </summary>
         /// <param name="data">송신할 문자열</param>
         public void sendMessage(string data)
         {
-            Console.WriteLine("<send Message>");
-            Console.WriteLine("{0}\n", data);
+            if (printCheck(opcode))
+            {
+                Console.WriteLine("<send Message>");
+                Console.WriteLine("{0}\n", data);
+            }
             byte[] byteData = Encoding.UTF8.GetBytes(data);
             sendVarData(byteData);
             
@@ -167,8 +208,11 @@ namespace AvalonServer
         /// <param name="byteData">송신할 데이터</param>
         public void sendMessage(byte[] byteData)
         {
-            Console.WriteLine("<send Message>");
-            Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
+            if (printCheck(opcode))
+            {
+                Console.WriteLine("<send Message>");
+                Console.WriteLine("{0}\n", Encoding.ASCII.GetString(byteData));
+            } 
             sendVarData(byteData);
             
         }
@@ -185,11 +229,12 @@ namespace AvalonServer
             int dataleft = size;
             int sent;
 
-            ServerMain.Sendlog.setOperation(Encoding.UTF8.GetString(data).Trim('\0'), 0);
-            ServerMain.Sendlog.setLog(userInfo.IP, userInfo.userIndex);
-            ServerMain.Sendlog.setSuccess(true);
-            ServerMain.Sendlog.save();//로그 저장
-            ServerMain.Sendlog.log();//로그 초기화
+            sendLog = new Log();
+
+            sendLog.setOperation(Encoding.UTF8.GetString(data).Trim('\0'), 0);
+            sendLog.setLog(userInfo.IP, userInfo.userIndex);
+            sendLog.setSuccess(true);
+            sendLog.save();//로그 저장
 
             byte[] datasize = new byte[4];
             datasize = BitConverter.GetBytes(size);
@@ -209,27 +254,44 @@ namespace AvalonServer
         /// 가변 데이터 수신
         /// </summary>
         /// <returns>수신된 데이터</returns>
-        private byte[] receiveVarData(){
+        private byte[] receiveVarData() {
             int total = 0;
             int recv;
             byte[] datasize = new byte[4];
-            recv = client.Receive(datasize,0,4,0);
-            if (recv == 0)
-                return null;
-            int size = BitConverter.ToInt32(datasize,0);
-            int dataleft = size;
-            byte[] data = new byte[size];
-
-            while(total < size){
-                recv = client.Receive(data,total,dataleft,0);
-                if(recv == 0)
-                {
-                    data = Encoding.UTF8.GetBytes("exit");
-                    break;
-                }
-                total += recv;
-                dataleft -= recv;
+            try
+            {
+                recv = client.Receive(datasize, 0, 4, 0);
             }
+            catch (SocketException e)
+            {
+                throw e;
+            }
+            
+                if (recv == 0)
+                    return null;
+                int size = BitConverter.ToInt32(datasize, 0);
+                int dataleft = size;
+                byte[] data = new byte[size];
+            try
+            {
+                while (total < size)
+                {
+                    recv = client.Receive(data, total, dataleft, 0);
+                    if (recv == 0)
+                    {
+                        data = Encoding.UTF8.GetBytes("exit");
+                        break;
+                    }
+                    total += recv;
+                    dataleft -= recv;
+                }
+            }
+            catch (SocketException e)
+            {
+                throw e;
+            }
+
+
             return data;
         }
     }

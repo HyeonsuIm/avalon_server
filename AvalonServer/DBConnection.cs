@@ -28,7 +28,7 @@ namespace AvalonServer
             try {
                 conn = new MySqlConnection(@"server="+IP+";userid="+ID+";password="+PW+";database="+database+";");
                 conn.Open();
-                Console.WriteLine("DB connection success\n");
+                //Console.WriteLine("DB connection success\n");
             }catch(MySqlException)
             {
                 Console.WriteLine("error");
@@ -359,9 +359,13 @@ namespace AvalonServer
          {
             string afterQuery;
             query = "insert into avalon.log (L_Operation, L_MessageCheck, L_UserIP, L_SendRecv";
-            
-            afterQuery = ") values ('"
-            + operation + "',"
+
+            afterQuery = ") values ('";
+
+
+            if(operation != null)
+                afterQuery += operation.Replace("\'", "\\\'");
+            afterQuery +="',"
             + messageCheck + ",'"
             + IP + "',"
             + sendRecv;
@@ -382,6 +386,7 @@ namespace AvalonServer
             executeCheck = true;
             MySqlCommand cmd = comm;
             cmd.ExecuteNonQuery();
+            disConnect();
             executeCheck = false;
         }
     }

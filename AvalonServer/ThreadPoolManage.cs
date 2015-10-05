@@ -33,7 +33,7 @@ namespace AvalonServer
             serverSocket.Bind(ipep);
             serverSocket.Listen(10);
 
-            new List<int>().Add(30);
+            //new List<int>().Add(30);
             
             clientList = new List<ConnectionThread>();
             //client = new TcpListener(IPAddress.Any, 9050);
@@ -149,7 +149,16 @@ namespace AvalonServer
         /// <param name="tcpClient">제거할 TcpClient 객체</param>
         public void removeClient(ConnectionThread connectionThread)
         {
-            clientList.Remove(connectionThread);
+            try
+            {
+                clientList.Remove(connectionThread);
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                Console.WriteLine("<error>");
+                Console.WriteLine(e.Message);
+                Console.WriteLine("index range out\n");
+            }
         }
 
         /// <summary>

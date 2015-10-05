@@ -69,7 +69,8 @@ namespace AvalonServer
             }
 
             Console.WriteLine("number : " + number);
-            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+            Console.WriteLine("roomInfo.size : " + roomInfo.Length);
+            Console.WriteLine("room count : " + roomCount + "\n");
 
             roomInfo[number] = new RoomInfo();
             roomInfo[number].createRoom(name, type, password, maxPerson, number, host);
@@ -87,7 +88,7 @@ namespace AvalonServer
         public void comeOutRoom(int roomNumber, int memberIndex)
         {
             roomInfo[roomNumber].removeUser(memberIndex);
-            if (roomInfo[roomNumber].getMemberCount() == 0)
+            if (roomInfo[roomNumber].getMemberCount() <= 0)
                 removeRoom(roomNumber);
         }
 
@@ -96,11 +97,11 @@ namespace AvalonServer
             roomInfo[number] = null;
 
             Console.WriteLine("number : " + number);
-            Console.WriteLine("roomInfo.size" + roomInfo.Length);
+            Console.WriteLine("roomInfo.size : " + roomInfo.Length);
+            Console.WriteLine("room count : " + roomCount + "\n");
 
             roomNumberUsed[number] = false;
             roomCount--;
-
         }
 
         public RoomInfo[] getRoomListInfo()
@@ -123,18 +124,23 @@ namespace AvalonServer
     public class RoomInfo
     {
         int maxPerson;
+        public int minPerson;
         string name;
         int type;
         int num;
         string password;
         int memberCount;
+
+        // 0 : 대기
+        // 1 : 게임중
+        public int state;
         
         //string[] memberNickList;
         //int[] memberIndexList;
         //int[] memberIPList;
         
         public TcpUserInfo[] memberInfo;
-
+        public bool[] readyState;
 
         public int getMemberCount()
         {
@@ -162,6 +168,7 @@ namespace AvalonServer
                 if (memberCount < maxPerson)
                 {
                     memberInfo[memberCount++] = addUser;
+
                 }
                 else
                     throw new Exception("인원 수 초과");
@@ -187,6 +194,7 @@ namespace AvalonServer
                 //앞으로 땡김
                 memberInfo[i] = memberInfo[i + 1];
             }
+            memberInfo[i] = null;
             memberCount--;
         }
 
@@ -194,11 +202,12 @@ namespace AvalonServer
         {
             num = number;
             this.maxPerson = maxPerson;
-            
+            this.minPerson = typetoMinPerson();
             //memberNickList = new string[maxPerson];
             //memberIndexList = new int[maxPerson];
             memberInfo = new TcpUserInfo[maxPerson];
-
+            readyState = new bool[maxPerson];
+            state = 0;
             this.name = name;
             this.type = type;
             this.password = password;
@@ -217,6 +226,8 @@ namespace AvalonServer
             roomInfo[5] = num.ToString();
             for (int i = 0; i < memberInfo.Length; i++)
             {
+                if (memberInfo[i] == null)
+                    break;
                 roomInfo[i + 6] = memberInfo[i].userNick;
             }
             return roomInfo;
@@ -227,6 +238,24 @@ namespace AvalonServer
             this.type = type;
             this.name = name;
             this.password = password;
+        }
+        
+        public void ready(int userIndex, bool check)
+        {
+            for (int i = 0; i < memberCount; i++)
+            {
+                if (memberInfo[i].userIndex == userIndex)
+                {
+                    readyState[i] = check;
+                    break;
+                }
+            }
+        }
+        int typetoMinPerson()
+        {
+            if (type == 0)
+                return 5;
+            return -1;
         }
     }
 }
