@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,70 +13,68 @@ namespace AvalonServer
     /// </summary>
     class Log
     {
-        string opcode;
-        string IP;
-        int messageCheck;
-        int userIndex;
-        int sendRecv;
-        DBConnection DBC;
 
-        public bool garbageCheck()
-        {
-            //Console.WriteLine(opcode);
-            if (opcode == "" || opcode == null) { }
-            else if (opcode.Equals("90200"))
-                return false;
-            else if (opcode.Substring(0, 3).Equals("103"))
-                return false;
-
-            return true;
-        }
-        public void setOperation(string OP, int sendRecv)
-        {
-
-            this.opcode = OP;
-            this.sendRecv = sendRecv;
-        }
-        public void setLog(string IP, int userIndex)
-        {
-            this.userIndex = userIndex;
-            if (IP != null)
-                this.IP = IP.Split(':')[0];
-        }
-        public void setLog(string IP)
-        {
-            if (IP != null)
-                this.IP = IP.Split(':')[0];
-        }
-        public void setSuccess(bool Check)
-        {
-            if (Check)
-                this.messageCheck = 1;
-            else
-                this.messageCheck = 0;
-        }
-        public void setIndex(int index)
-        {
-            this.userIndex = index;
-        }
-
+        string fileName;
+        FileStream filestreamer;
+        string sDirPath;
+        string delimeter = "\u0002";
+        bool used = false;
         public Log()
         {
-            opcode = "";
-            IP = "";
-            messageCheck = 0;
-            userIndex = -1;
-            sendRecv = -1;
+            sDirPath = AppDomain.CurrentDomain.BaseDirectory;
+            sDirPath = sDirPath +@"Log\";
+            DirectoryInfo di = new DirectoryInfo(sDirPath);
+            if (di.Exists == false)
+            {
+                di.Create();
+            }
+            sDirPath += System.DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+           
+        }
+        private bool garbageCheck(string data)
+        {
+            return data == "90200";
+        }
+        public void save(string data, string IP, string id, int sendRecv)
+        {
+            if (garbageCheck(data))
+                return;
+            while (used) { }
+            used = true;
+
+            filestreamer = new FileStream(this.sDirPath, FileMode.Append, FileAccess.Write);
+            using(StreamWriter sWriter = new StreamWriter(filestreamer))
+            {
+                string time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                sWriter.WriteLine(time + delimeter + IP + delimeter + id + delimeter + sendRecv + delimeter + data + delimeter + "0");
+                filestreamer.Flush();
+            }
+            filestreamer.Close();
+            used = false;
+           
+        }
+        public void save(string data, string IP, string id, int sendRecv, string exceptionMessage)
+        {
+            if (garbageCheck(data))
+                return;
+            while (used) { }
+            used = true;
+
+            filestreamer = new FileStream(this.sDirPath, FileMode.Append, FileAccess.Write);
+            using (StreamWriter sWriter = new StreamWriter(filestreamer))
+            {
+                string time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                sWriter.WriteLine(time + delimeter + IP + delimeter + sendRecv + delimeter + data + delimeter + exceptionMessage);
+
+                filestreamer.Flush();
+            }
+            filestreamer.Close();
+            used = false;
         }
         
-
-        public void save()
+        ~Log()
         {
-            //DBC = new DBConnection();
-            //DBC.connect();
-            //if (garbageCheck())
-            //    DBC.createLog(userIndex,opcode,messageCheck,IP,sendRecv);
-            
+            filestreamer.Close();
         }
     }
 

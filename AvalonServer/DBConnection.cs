@@ -233,50 +233,47 @@ namespace AvalonServer
         /// <param name="draw">무</param>
         /// <returns></returns>
 
-        public int setWinLose(string[] argumentlist)
+        public int setWinLose(int index, string winCheck)
         {
             try
             {
                 int result = 0;
 
-                string winIndex = "";
-                string loseIndex = "";
-                string drawIndex = "";
                 string sql = "";
 
-                bool winCheck = false;
-                bool loseCheck = false;
-                bool drawCheck = false;
-                for (int i = 0; i < argumentlist.Length; i += 2)
-                {
+                //bool winCheck = false;
+                //bool loseCheck = false;
+                //bool drawCheck = false;
+                //for (int i = 0; i < argumentlist.Length; i += 2)
+                //{
 
-                    switch (Int32.Parse(argumentlist[i + 1]))
-                    {
-                        case 0:
-                            if (drawCheck)
-                                drawIndex += ",";
-                            drawIndex += argumentlist[i];
-                            break;
-                        case 1:
-                            if (winCheck)
-                                winIndex += ",";
-                            winIndex += argumentlist[i];
-                            break;
-                        case 2:
-                            if (loseCheck)
-                                loseIndex += ",";
-                            loseIndex += argumentlist[i];
-                            break;
-                    }
-                }
-                if (!drawCheck)
-                    drawIndex = "''";
-                if (!winCheck)
-                    winIndex = "''";
-                if (!loseCheck)
-                    loseIndex = "''";
+                //    switch (Int32.Parse(argumentlist[i + 1]))
+                //    {
+                //        case 0:
+                //            if (drawCheck)
+                //                drawIndex += ",";
+                //            drawIndex += argumentlist[i];
+                //            break;
+                //        case 1:
+                //            if (winCheck)
+                //                winIndex += ",";
+                //            winIndex += argumentlist[i];
+                //            break;
+                //        case 2:
+                //            if (loseCheck)
+                //                loseIndex += ",";
+                //            loseIndex += argumentlist[i];
+                //            break;
+                //    }
+                //}
+                //if (!drawCheck)
+                //    drawIndex = "''";
+                //if (!winCheck)
+                //    winIndex = "''";
+                //if (!loseCheck)
+                //    loseIndex = "''";
 
-                sql = getSql(winIndex, loseIndex, drawIndex);
+                sql = getSql(index, winCheck);
 
                 MySqlCommand comm = new MySqlCommand(sql, conn);
                 execute(comm);
@@ -290,22 +287,37 @@ namespace AvalonServer
         }
 
 
-        private string getSql(string win, string lose, string draw)
+        private string getSql(int index, string winCheck)
         {
-            return "update winlate " +
-                            "set W_win = case " +
-                                    "when u_index in  (" + win + ") then w_win + 1" +
-                                    "else W_win" +
-                                    "end," +
-                            "W_lose = case" +
-                                    "when u_index in (" + lose + ") then w_lose + 1" +
-                                    "else W_lose" +
-                                "end," +
-                            "W_draw = case" +
-                                "when  u_index in (" + draw + ") then w_draw + 1" +
-                                "else w_draw" +
-                                "end" +
-                         "where U_index in ("+win+","+lose+","+draw+")";
+            //return "update winlate " +
+            //                "set W_win = case " +
+            //                        "when u_index in  (" + win + ") then w_win + 1" +
+            //                        "else W_win" +
+            //                        "end," +
+            //                "W_lose = case" +
+            //                        "when u_index in (" + lose + ") then w_lose + 1" +
+            //                        "else W_lose" +
+            //                    "end," +
+            //                "W_draw = case" +
+            //                    "when  u_index in (" + draw + ") then w_draw + 1" +
+            //                    "else w_draw" +
+            //                    "end" +
+            //             "where U_index in ("+win+","+lose+","+draw+")";
+            string result = "update winlate ";
+            switch(winCheck)
+            {
+                case "0" :
+                    result += "W_draw set W_win = W_draw + 1 where U_index = " + index + ";";
+                    break;
+                case "1" : 
+                    result += "W_win set W_win = W_win + 1 where U_index = " + index + ";";
+                    break;
+                case "2" :
+                    result += "W_lose set W_win = W_lose + 1 where U_index = " + index + ";";
+                    break;
+            }
+
+            return result;
         }
 
         /// <summary>
