@@ -15,8 +15,6 @@ namespace AvalonServer
         // 클라이언트 접속 IP
         public IPEndPoint clientIpep;
         //로그 기록을 위한 Log 객체 선언
-        Log recvLog;
-        Log sendLog;
         //유저 정보
         public TcpUserInfo userInfo
         {
@@ -91,14 +89,17 @@ namespace AvalonServer
             CommunicationForm comm = null;
             while (true)
             {
-                recvLog = new Log();
                 try {
                     // 데이터 수신 대기 및 수신
                     data = receiveVarData();
                     if (data == null)
                         break;
 
-                    //recvLog.setOperation(Encoding.ASCII.GetString(data).Trim('\0'), 1);
+
+                    if (userInfo != null && userInfo.userId != null)
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1);
+                    else
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1);
                     opcode = Encoding.ASCII.GetString(data).Trim('\0').Substring(0, 5);
                     if (printCheck(opcode))
                         Console.WriteLine("\n********************message receive*********************");
@@ -110,10 +111,6 @@ namespace AvalonServer
                     comm.connectionThread = this;
                     comm.threadPoolManage = threadPoolManage;
                     comm.roomListInfo = threadPoolManage.roomListInfo;
-                    if (userInfo.userIndex == 0)
-                        recvLog.setLog(clientIpep.ToString());
-                    else
-                        recvLog.setLog(userInfo.IP, userInfo.userIndex);
                     // 분할된 데이터 처리
                     comm.process();
 
@@ -123,7 +120,6 @@ namespace AvalonServer
                         userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
                         userInfo.IP = clientIpep.ToString();
                         userInfo.State = (int)TcpUserInfo.state.LOBBY;
-                        recvLog.setIndex(userInfo.userIndex);
 
                     }
                     if (comm.formNumber == 9 && comm.opcode == 0)
@@ -136,35 +132,43 @@ namespace AvalonServer
                     string receiveString = Encoding.UTF8.GetString(data).Trim('\0');
                     if (printCheck(Encoding.ASCII.GetString(data).Trim('\0')))
                         Console.WriteLine("{0} : {1}", clientIpep.ToString(), receiveString);
-                    recvLog.setSuccess(true);
+
                 }
                 catch (ArgumentException ex)
                 {
                     Console.WriteLine("<argument error>");
-                    Console.WriteLine(ex.Message + "\n");
-                    recvLog.setSuccess(false);
-                    recvLog.save();
-                    recvLog = new Log();
-                    recvLog.setOperation(ex.Message,1);
+                    Console.WriteLine(ex.Message + "\n"); 
+
+                    if (userInfo != null)
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1, ex.Message);
+                    else
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1,ex.Message);
+
                 }
                 catch(SocketException e)
                 {
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<socket error>\n" + e.Message + "\n");
+
+                    if (userInfo != null)
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
+                    else
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1, e.Message);
                 }
                 catch(Exception e)
                 {
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<error>\n" + e.Message + "\n");
-                    recvLog.setSuccess(false);
-                    recvLog.save();
-                    recvLog = new Log();
-                    recvLog.setOperation(e.Message, 1);
+
+                    if (userInfo != null)
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
+                    else
+                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1, e.Message);
+
                     break;
                 }
                 finally
                 {
-                    recvLog.save();//로그 저장
                 }
                 if (printCheck(opcode))
                     Console.WriteLine("********************message process complete*********************\n");
@@ -229,13 +233,10 @@ namespace AvalonServer
             int dataleft = size;
             int sent;
 
-            sendLog = new Log();
-
-            sendLog.setOperation(Encoding.UTF8.GetString(data).Trim('\0'), 0);
-            sendLog.setLog(userInfo.IP, userInfo.userIndex);
-            sendLog.setSuccess(true);
-            sendLog.save();//로그 저장
-
+            if (userInfo != null)
+                ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1);
+            else
+                ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1);
             byte[] datasize = new byte[4];
             datasize = BitConverter.GetBytes(size);
             sent = client.Send(datasize);

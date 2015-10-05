@@ -16,19 +16,66 @@ namespace AvalonServer
 
         string fileName;
         FileStream filestreamer;
+        string sDirPath;
+        string delimeter = "\u0002";
+        bool used = false;
         public Log()
         {
-            string sDirPath;
-            sDirPath = "\\images";
+            sDirPath = AppDomain.CurrentDomain.BaseDirectory;
+            sDirPath = sDirPath +@"Log\";
             DirectoryInfo di = new DirectoryInfo(sDirPath);
             if (di.Exists == false)
             {
                 di.Create();
             }
-            fileName = System.DateTime.Now.ToString("yyyy-MM-dd");
-            filestreamer = File.Create(fileName);
+            sDirPath += System.DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+           
+        }
+        private bool garbageCheck(string data)
+        {
+            return data == "90200";
+        }
+        public void save(string data, string IP, string id, int sendRecv)
+        {
+            if (garbageCheck(data))
+                return;
+            while (used) { }
+            used = true;
+
+            filestreamer = new FileStream(this.sDirPath, FileMode.Append, FileAccess.Write);
+            using(StreamWriter sWriter = new StreamWriter(filestreamer))
+            {
+                string time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                sWriter.WriteLine(time + delimeter + IP + delimeter + id + delimeter + sendRecv + delimeter + data + delimeter + "0");
+                filestreamer.Flush();
+            }
+            filestreamer.Close();
+            used = false;
+           
+        }
+        public void save(string data, string IP, string id, int sendRecv, string exceptionMessage)
+        {
+            if (garbageCheck(data))
+                return;
+            while (used) { }
+            used = true;
+
+            filestreamer = new FileStream(this.sDirPath, FileMode.Append, FileAccess.Write);
+            using (StreamWriter sWriter = new StreamWriter(filestreamer))
+            {
+                string time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                sWriter.WriteLine(time + delimeter + IP + delimeter + sendRecv + delimeter + data + delimeter + exceptionMessage);
+
+                filestreamer.Flush();
+            }
+            filestreamer.Close();
+            used = false;
         }
         
+        ~Log()
+        {
+            filestreamer.Close();
+        }
     }
 
     
