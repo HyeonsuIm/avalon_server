@@ -307,13 +307,13 @@ namespace AvalonServer
             switch(winCheck)
             {
                 case "0" :
-                    result += "W_draw set W_win = W_draw + 1 where U_index = " + index + ";";
+                    result += "W_draw set W_draw = W_draw + 1 where U_index = " + index + ";";
                     break;
                 case "1" : 
                     result += "W_win set W_win = W_win + 1 where U_index = " + index + ";";
                     break;
                 case "2" :
-                    result += "W_lose set W_win = W_lose + 1 where U_index = " + index + ";";
+                    result += "W_lose set W_lose = W_lose + 1 where U_index = " + index + ";";
                     break;
             }
 
