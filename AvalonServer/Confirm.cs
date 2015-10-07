@@ -25,8 +25,8 @@ namespace AvalonServer
         {
             this.Email = Email;
             EmailHead = "Avalon 비밀번호 찾기";
-            EmailBody = "회원가입해 주셔서 감사합니다. </br> 가입을 위한 인증번호는 다음과 같습니다. </br>";
-            EmailBody2 = "</br>본 이메일은 발신 전용 메일입니다. 관련된 문의는 ~~로 부탁드립니다.";
+            EmailBody = "임시 비밀번호는 다음과 같습니다.</br></br>";
+            EmailBody2 = "</br>본 이메일은 발신 전용 메일입니다.";
 
             Send();
         }

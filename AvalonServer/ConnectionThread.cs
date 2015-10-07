@@ -54,11 +54,19 @@ namespace AvalonServer
         {
             connections++;
             threadPoolManage.addClient(this);
+            try {
 
-            clientIpep = (IPEndPoint)client.RemoteEndPoint;
-            Console.WriteLine("New Client connect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
-            
-            sendMessage("9" + "00" + "00");
+                clientIpep = (IPEndPoint)client.RemoteEndPoint;
+                Console.WriteLine("New Client connect\nip : {0}\nconnections : {1}\n", clientIpep.ToString(), connections);
+
+                sendMessage("9" + "00" + "00");
+            }catch(Exception e)
+            {
+                connections--;
+                threadPoolManage.removeClient(this);
+                Console.WriteLine(e.Message);
+                Console.WriteLine("접속 중 연결 끊김");
+            }
         }
         
         /// <summary>
