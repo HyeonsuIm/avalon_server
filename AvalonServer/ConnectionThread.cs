@@ -108,7 +108,12 @@ namespace AvalonServer
                         ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1);
                     else
                         ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1);
+                    try {
                     opcode = Encoding.ASCII.GetString(data).Trim('\0').Substring(0, 5);
+                    }catch(Exception )
+                    {
+                        throw new ArgumentException();
+                    }
                     if (printCheck(opcode))
                         Console.WriteLine("\n********************message receive*********************");
                     // 수신 된 데이터를 분석하기 위한 객체 생성
@@ -123,13 +128,20 @@ namespace AvalonServer
                     comm.process();
 
                     // 예외처리
-                    if (comm.formNumber == 0 && comm.opcode == 10)
+                    if (comm.formNumber == 0)
                     {
-                        userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
+                        if (((LoginForm)comm).setUserInfo(userInfo))
+                        {
                         userInfo.IP = clientIpep.ToString();
                         userInfo.State = (int)TcpUserInfo.state.LOBBY;
-
+                        }
                     }
+                    //if (comm.formNumber == 0 && comm.opcode == 10)
+                    //{
+                    //    userInfo.userNick = ((LoginForm)comm).getInfo(out userInfo.userIndex, out userInfo.userId);
+                    //    userInfo.IP = clientIpep.ToString();
+                    //    userInfo.State = (int)TcpUserInfo.state.LOBBY;
+                    //}
                     if (comm.formNumber == 9 && comm.opcode == 0)
                     {
                         break;
@@ -158,7 +170,7 @@ namespace AvalonServer
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<socket error>\n" + e.Message + "\n");
 
-                    if (userInfo != null)
+                    if (userInfo != null userInfo.userId != null)
                         ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
                     else
                         ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), "-1", 1, e.Message);
