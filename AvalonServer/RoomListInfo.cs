@@ -141,6 +141,13 @@ namespace AvalonServer
         
         public TcpUserInfo[] memberInfo;
         public bool[] readyState;
+        public void readyInit()
+        {
+            for(int i=0;i< memberCount; i++)
+            {
+                readyState[i] = false;
+            }
+        }
 
         public int getMemberCount()
         {
@@ -167,8 +174,8 @@ namespace AvalonServer
             {
                 if (memberCount < maxPerson)
                 {
+                    readyState[memberCount] = false;
                     memberInfo[memberCount++] = addUser;
-
                 }
                 else
                     throw new Exception("인원 수 초과");

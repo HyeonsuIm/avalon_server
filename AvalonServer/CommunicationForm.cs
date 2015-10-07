@@ -453,6 +453,7 @@ namespace AvalonServer
                     bf = new BinaryFormatter();
                     ms = new MemoryStream();
                     threadPoolManage.roomListInfo.roomInfo[connectionThread.userInfo.Number].state = 0;
+                    threadPoolManage.roomListInfo.roomInfo[connectionThread.userInfo.Number].readyInit();
                     bf.Serialize(ms, threadPoolManage.roomListInfo.roomInfo[connectionThread.userInfo.Number]);
 
                     ms.Position = 0;
