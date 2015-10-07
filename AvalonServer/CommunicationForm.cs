@@ -90,6 +90,7 @@ namespace AvalonServer
                         {
                             if (i == int.Parse(result))
                             {
+                                result = "" + formNumber + opcode + "01" + "0";
                                 connectionThread.sendMessage("010010");
                                 check = true;
                             }
@@ -197,9 +198,22 @@ namespace AvalonServer
         /// <param name="index">index가 저장될 변수</param>
         /// <param name="Id">id가 저장될 변수</param>
         /// <returns></returns>
+
+        public bool setUserInfo(TcpUserInfo userInfo)
+        {
+            if(opcode == 10 && result.Substring(5) != "0")
+            {
+                userInfo.userIndex = Int32.Parse(result.Substring(5));
+                userInfo.userId = userId;
+                userInfo.userNick = userNick;
+                return true;
+            }
+            return false;
+        }
+
         public string getInfo(out int index,out string Id)
         {
-            index = Int32.Parse(result.Substring(5));
+            index = Int32.Parse(result);
             Id = userId;
             return userNick;
         }
@@ -328,7 +342,7 @@ namespace AvalonServer
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "0");
+                        connectionThread.sendMessage("" + formNumber + "05" + "01" + "-1");
                     }
                     break;
             }
