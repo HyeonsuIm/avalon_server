@@ -159,9 +159,9 @@ namespace AvalonServer
                     Console.WriteLine("<socket error>\n" + e.Message + "\n");
 
                     if (userInfo != null)
-                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
+                        ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
                     else
-                        ServerMain.Log.save(Encoding.UTF8.GetString(data).Trim('\0'), this.clientIpep.Address.ToString(), "-1", 1, e.Message);
+                        ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), "-1", 1, e.Message);
                     break;
                 }
                 catch(Exception e)
