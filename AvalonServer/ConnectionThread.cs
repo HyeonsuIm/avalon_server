@@ -170,7 +170,7 @@ namespace AvalonServer
                     threadPoolManage.removeClient(this);
                     Console.WriteLine("<socket error>\n" + e.Message + "\n");
 
-                    if (userInfo != null userInfo.userId != null)
+                    if (userInfo != null && userInfo.userId != null)
                         ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), userInfo.userId, 1, e.Message);
                     else
                         ServerMain.Log.save("-1", this.clientIpep.Address.ToString(), "-1", 1, e.Message);
